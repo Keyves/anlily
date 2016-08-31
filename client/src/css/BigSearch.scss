@@ -1,0 +1,29 @@
+.search-bg {
+  width: 1280px;
+  height:251px;
+  position: relative;
+  //background: url(../images/topic/topic-banner.png);
+}
+
+.search-content {
+  width: 578px;
+  height: 52px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -299px;
+  margin-top: -26px;
+  border-radius: 40px;
+  border: 2px solid #fff;
+  background-color: #c1c1c1;
+}
+
+.search-btn {
+  position: absolute;
+  right: 50%;
+  top: 50%;
+  margin-right: -270px;
+  margin-top: -14px;
+  background: transparent;
+  border: none;
+}

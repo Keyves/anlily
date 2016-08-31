@@ -1,0 +1,10 @@
+# folder
+node_modules
+coverage
+design
+.db
+
+# file
+*.DS_Store
+*.log
+*.map

@@ -1,0 +1,154 @@
+
+/*导航栏样式*/
+.app-container {
+    width: 68px;
+    height: 100%;
+    min-height: 680px;
+    position: fixed;
+    z-index: 1;
+    background-color: #333;
+}
+
+/*logo样式*/
+.logo-wrapper {
+    width: 480px;
+    height: 150px;
+
+    /*链接到首页*/
+    .main-logo {
+        display: block;
+        width: 137px;
+        height: 138px;
+        margin-top: 5px;
+        background: url(../images/home/nav/main-logo.png);
+        text-indent: -9999px;
+
+        &:hover + span {
+            opacity: 1;
+        }
+    }
+
+    /*隐藏框*/
+    span {
+        position: relative;
+        margin-top: 45px;
+        display: block;
+        width: 312px;
+        height: 70px;
+        border: 6px solid #F97B7E;
+        background: #fff;
+        border-radius: 6px;
+        text-align: center;
+        line-height: 64px;
+        opacity: 0;
+
+        /*三角*/
+        &:after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            position: absolute;
+            left: 0;
+            top: 0;
+            margin-top: 20px;
+            margin-left: -24px;
+            border-width: 11px 24px 11px 0;
+            border-style: solid;
+            border-color: transparent #f97b7e transparent transparent;
+        }
+    }
+}
+
+/*搜索框样式*/
+.form-inline {
+    position: absolute;
+    margin-top: 28px;
+    width: 276px;
+    height: 46px;
+    padding: 0;
+    
+    .select-list {
+        width: 68px;
+        height: 46px;
+    }
+
+    .search-input {
+        width: 162px;
+        height: 46px;
+    }
+
+    .my-search-btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 46px;
+        height: 46px;
+        padding: 0;
+        background: #333 url(../images/home/search.svg) 50% 50% no-repeat;
+        background-size: 35px 35px;
+        text-indent: -999px;
+        border: none;
+
+        &:hover {
+            background-image: url(../images/home/search-hover.svg);
+        }
+    }
+}
+
+/*四个链接*/
+.main-nav {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 20px;
+    padding-left: 12px;
+    list-style: none;
+    color: #fff;
+
+    .link {
+        display: block;
+        width: 43px;
+        height: 43px;
+        margin-top: 22px;
+    }
+    .link-find {
+        background-repeat: no-repeat;
+        background-image: url(../images/home/nav/1-1.png);
+
+        &:hover {
+            background-image: url(../images/home/nav/1-2.png);
+        }
+    }
+
+    .link-topic {
+        background-repeat: no-repeat;
+        background-image: url(../images/home/nav/2-1.png);
+
+        &:hover {
+            background-image: url(../images/home/nav/2-2.png);
+        }
+    }
+
+    .link-login {
+        background-repeat: no-repeat;
+        background-position: 5px 0;
+        background-image: url(../images/home/nav/3-1.png);
+
+        &:hover {
+            background-image: url(../images/home/nav/3-2.png);
+        }
+    }
+
+    .link-sellanli {
+        background-repeat: no-repeat;
+        background-image: url(../images/home/nav/4-1.png);
+
+        &:hover {
+            background-image: url(../images/home/nav/4-2.png);
+        }
+    }
+}
+
+
+
+

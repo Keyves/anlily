@@ -1,0 +1,1 @@
+export customStore from './customStore'
