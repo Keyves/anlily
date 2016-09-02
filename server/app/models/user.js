@@ -1,9 +1,52 @@
-const { Schema, model } = require('mongoose')
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+const ObjectId = Schema.Types.ObjectId
+const SALT_WORK_FACTOR = 10
 
-const userSchema = Schema({
-	username: String,
+const userSchema = new Schema({
+	username: {
+		unique: true,
+		type: String
+	},
 	password: String,
-	level: Number
+	nickname: String,
+	avator: String,
+	email: String,
+	followers: [{
+		type: ObjectId,
+		ref: 'User'
+	}],
+	following: [{
+		type: ObjectId,
+		ref: 'User'
+	}],
+	createdTime: Date,
+	// 0: nomal user
+	// 1: verified user
+	// 2: professonal user
+	// >10: admin
+	// >50: super admin
+	role: {
+		type: Number,
+		default: 0
+	}
 })
 
-module.exports = model('user', userSchema)
+
+userSchema.statics = {
+	fetch: function(cb) {
+		return this
+			.find({})
+			.sort('updateAt')
+			.exec(cb)
+	},
+	findById: function(id, cb) {
+		return this
+			.findOne({
+				_id: id
+			})
+			.exec(cb)
+	}
+}
+
+module.exports = mongoose.model('user', userSchema)
