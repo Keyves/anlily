@@ -3,7 +3,7 @@ const userDriver = require('../drivers/user')
 
 router
 .get('/', async (ctx) => {
-	ctx.body = 'what happened'
+	console.log(ctx.session.user)
 })
 .post('/', async (ctx) => {
 	ctx.body = 'what happened'
@@ -15,13 +15,16 @@ router
 
 })
 .post('/login', async (ctx) => {
-	const user = ctx.request.body
-	await userDriver.login(user)
+	const userinfo = ctx.request.body
+	const user = await userDriver.login(userinfo)
+	ctx.session.user = user
+	console.log(ctx.session.user)
 	ctx.body = null
 })
 .post('/register', async (ctx) => {
-	const user = ctx.request.body
-	await userDriver.register(user)
+	const userinfo = ctx.request.body
+	const user = await userDriver.register(userinfo)
+	ctx.session.user = user
 	ctx.body = null
 })
 

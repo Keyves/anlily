@@ -19,6 +19,7 @@ mongoose.connection.on('error', (err) => console.log(err))
 
 
 // middlewares
+app.keys = ['session-key']
 app.use(convert(session(app)))
 app.use(convert(bodyparser))
 app.use(convert(json()))

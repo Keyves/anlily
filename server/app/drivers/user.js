@@ -17,9 +17,9 @@ const userDriver = {
 	 * 注册
 	 * @param  {Object} user 用户信息
 	 */
-	async register(user) {
+	async register(userinfo) {
 		try {
-			const { username, password } = user
+			const { username, password } = userinfo
 			const _user = await UserModel.findOne({username})
 
 			if (_user) {
@@ -27,9 +27,11 @@ const userDriver = {
 			} else {
 				const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
 				const hash = await bcrypt.hash(password, salt)
-				user.password = hash
-				user.createdTime = Date.now()
-				await new UserModel(user).save()
+				userinfo.password = hash
+				
+				const user = new UserModel(userinfo)
+				await user.save()
+				return user
 			}
 		} catch(e) {
 			e.message = `insert post fail - ${e.message}`
@@ -41,14 +43,16 @@ const userDriver = {
 	 * 登录
 	 * @param  {Object} user 用户信息
 	 */
-	async login(user) {
+	async login(userinfo) {
 		try {
-			const { username, password } = user
+			const { username, password } = userinfo
 			const _user = await UserModel.findOne({username})
 
 			if (_user) {
 				if (!await bcrypt.compare(password, _user.password)) {
 					throw new AuthorizeError(`密码错误`)
+				} else {
+					return _user
 				}
 			} else {
 				throw new AuthorizeError(`用户不存在`)

@@ -32,21 +32,4 @@ const userSchema = new Schema({
 	}
 })
 
-
-userSchema.statics = {
-	fetch: function(cb) {
-		return this
-			.find({})
-			.sort('updateAt')
-			.exec(cb)
-	},
-	findById: function(id, cb) {
-		return this
-			.findOne({
-				_id: id
-			})
-			.exec(cb)
-	}
-}
-
 module.exports = mongoose.model('user', userSchema)

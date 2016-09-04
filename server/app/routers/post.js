@@ -15,7 +15,7 @@ router
 	await postDriver.insert(user, post)
 })
 .patch('/', async (ctx) => {
-	
+
 })
 .put('/', async (ctx) => {
 	const post = ctx.request.body
