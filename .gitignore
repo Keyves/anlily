@@ -3,6 +3,7 @@ node_modules
 coverage
 design
 .db
+.temp
 
 # file
 *.DS_Store

@@ -28,7 +28,7 @@ const userDriver = {
 				const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
 				const hash = await bcrypt.hash(password, salt)
 				userinfo.password = hash
-				
+
 				const user = new UserModel(userinfo)
 				await user.save()
 				return user
@@ -50,12 +50,12 @@ const userDriver = {
 
 			if (_user) {
 				if (!await bcrypt.compare(password, _user.password)) {
-					throw new AuthorizeError(`密码错误`)
+					throw new AuthorizeError('密码错误')
 				} else {
 					return _user
 				}
 			} else {
-				throw new AuthorizeError(`用户不存在`)
+				throw new AuthorizeError('用户不存在')
 			}
 		} catch (e) {
 			e.message = `login fail - ${e.message}`

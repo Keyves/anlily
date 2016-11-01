@@ -14,7 +14,7 @@ console.error = (message) => console.log(`\n\x1b[31m${message}\x1b[0m\n`)
 console.info = (message) => console.log(`\n\x1b[46m${message}\x1b[0m\n`)
 
 // 连接mongodb数据库
-mongoose.connect('localhost', 'anlily')
+mongoose.connect('localhost', 'anonymous')
 mongoose.connection.on('error', (err) => console.log(err))
 
 
