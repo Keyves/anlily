@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const autoprefixer = require('autoprefixer')
 
 const SRC_PATH = path.resolve(__dirname, 'src')
+const ASSETS_PATH = path.resolve(__dirname, 'assets')
 const DIST_PATH = path.resolve(__dirname, 'dist')
 
 const config = {
@@ -27,8 +28,8 @@ const config = {
 	resolve: {
 		alias: {
 			src: SRC_PATH,
-			vue: 'vue/dist/vue.js',
-			assets: path.resolve(SRC_PATH, 'css')
+			assets: ASSETS_PATH,
+			vue: 'vue/dist/vue.js'
 		},
 		extensions: ['', '.js', '.vue']
 	},
@@ -60,6 +61,9 @@ const config = {
 		}]
 	},
 	postcss: [autoprefixer({ browsers: ['> 1%', 'last 2 versions'] })],
+	externals: {
+		jquery: 'window.$'
+	},
 	plugins: [
 		new webpack.optimize.CommonsChunkPlugin('lib', 'js/lib.js'),
 		new ExtractTextPlugin('[name].css', {

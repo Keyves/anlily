@@ -1,6 +1,6 @@
 <template>
-	<button class="c-button" :class="oClass" :type="type" :style="oStyle">
-		<c-icon :type="icon" v-if="icon"></c-icon>
+	<button class="c-button" :class="oClass" :type="type" :style="oStyle" @click="handleClick">
+		<c-icon :type="icon" :color="iconColor" v-if="icon"></c-icon>
 		<slot></slot>
 	</button>
 </template>
@@ -17,6 +17,7 @@ export default {
 		},
 		type: String,
 		icon: String,
+		iconColor: String,
 		style: {
 			type: Object,
 			default: () => ({})
@@ -24,6 +25,11 @@ export default {
 		class: {
 			type: String,
 			default: ''
+		}
+	},
+	methods: {
+		handleClick(e) {
+			this.$emit('click', e)
 		}
 	},
 	computed: {
@@ -57,23 +63,35 @@ export default {
 .c-button {
 	-webkit-mask-image: -webkit-radial-gradient(circle, white, black);
 	outline: none;
+	border: none;
     display: flex;
     justify-content: center;
 	align-items: center;
-    padding: .1rem .2rem;
+    padding: 5px 15px;
+	border-radius: 3px;
     text-decoration: none;
     color: #666;
     touch-action: manipulation;
 	cursor: pointer;
 
+	&[disabled] {
+		border: 1px solid gray;
+		color: white;
+		background: #999;
+	}
+
 	&:hover {
 		opacity: .6;
+	}
+
+	&:focus {
+		outline: none;
 	}
 
 	&-default {
 		background-color: $color-default;
 		color: $color-normal-font;
-		border: 1px solid #ccc;
+		border: none;
 	}
 
 	&-ghost {
@@ -84,8 +102,9 @@ export default {
 
 	&-primary {
 		background-color: $color-primary;
+		background-image: -webkit-linear-gradient(top,#4d90fe,#4787ed);
+		border: 1px solid #3079ed;
 		color: white;
-		border: none;
 	}
 
 	&-success {

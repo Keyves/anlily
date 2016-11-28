@@ -1,7 +1,7 @@
 const { AuthorizeError } = require('../app/errors')
 
 
-function handleResponse() {
+function handleError() {
 	return async (ctx, next) => {
 		try {
 			await next()
@@ -38,4 +38,4 @@ function handleResponse() {
 	}
 }
 
-module.exports = handleResponse
+module.exports = handleError

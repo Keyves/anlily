@@ -1,11 +1,13 @@
 import Vue  from 'vue'
 import Vuex from 'vuex'
-import Store from './store'
+import * as actions from './actions'
+import storeConf from './store'
 
 Vue.use(Vuex)
 
+storeConf.actions = actions
 
-const store = new Vuex.Store(Store)
+const store = new Vuex.Store(storeConf)
 
 if (module.hot) {
 	module.hot.accept(['./actions', './store', './types'], () => {

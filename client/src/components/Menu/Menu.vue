@@ -17,7 +17,15 @@ export default {
 	name: 'c-menu',
 	props: {
 		text: String,
-		expandStatus: false
+		expand: {
+			type: Boolean,
+			default: false
+		}
+	},
+	data() {
+		return {
+			expandStatus: this.expand
+		}
 	},
 	methods: {
 		changeExpandStatus() {

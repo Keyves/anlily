@@ -1,56 +1,86 @@
 import * as types from './types'
+import forums from 'src/conf/forums'
+import { clone } from 'src/utils'
 
-const state = {
-	logined: true,
-	loading: false,
-	snack: {
-		message: '',
-		action: '',
-		actionColor: '',
-		duration: 2000
-	},
+const initalPost = {
+	text: '',
+	images: [],
+	tags: [],
+	comments: []
+}
+
+const initalComment = {
+	reply: 0,
+	text: '',
+	images: []
+}
+
+const initalState = {
 	userinfo: {
-		access_token: ''
+		username: '',
+		email: '',
+		password: ''
 	},
-	page: {}
+	status: {
+		anonymousName: '佚名',
+		authorizeVisible: true,
+		editorVisible: false,
+		category: '综合版1',
+		logined: false
+	},
+	posts: [],
+	post: clone(initalPost),
+	comment: clone(initalComment),
+	forums
 }
 
-const baseMutations = {
-	[types.SET_USERINFO] (state, userinfo){
-		state.info = Object.assign({}, state.userinfo, userinfo)
+const mutations = {
+	[types.GET_POSTS] (state, posts) {
+		state.posts = posts
 	},
-	[types.LOGIN] (state) {
-		state.logined = true
+	[types.CHANGE_USERNAME_TEXT] (state, username) {
+		state.userinfo.username = username
 	},
-	[types.LOGOUT] (state) {
-		state.logined = false
+	[types.CHANGE_PASSWORD_TEXT] (state, password) {
+		state.userinfo.password = password
 	},
-	[types.ADD_SNACK] (state, option) {
-		//option为新添加，可以不解构也能触发响应
-		state.snack = Object.assign({}, state.snack, option)
+	[types.CHANGE_EMAIL_TEXT] (state, email) {
+		state.userinfo.email = email
+	},
+	[types.CHANGE_POST_CONTENT] (state, value) {
+		state.post.text = value
+	},
+	[types.CHANGE_COMMENT_TEXT] (state, value) {
+		console.debug(value)
+		state.comment.text = value
+	},
+	[types.TOGGLE_EDITOR_VISIBLE] (state) {
+		state.status.editorVisible = !state.status.editorVisible
+	},
+	[types.TOGGLE_AUTHORIZE_VISIBLE] (state) {
+		state.status.authorizeVisible = !state.status.authorizeVisible
+	},
+	[types.CHANGE_CATEGORY] (state, category) {
+		state.status.category = category
+	},
+	[types.ENTER_POST_FETCH_SUCCESS] (state, post) {
+		state.posts.push(clone(post))
+		state.post = clone(initalPost)
+		console.debug(state.post)
+	},
+	[types.ENTER_COMMENT_FETCH_SUCCESS] (state, [comment, index]) {
+		state.posts[index].comments.push(clone(comment))
+		state.comment = clone(initalComment)
+	},
+	[types.LOGINED] (state, user) {
+		state.status.logined = true
+		state.userinfo = clone(state.userinfo, user)
 	}
-}
-
-const statusMutations = {
-	[types.LOADING_START] (state) {
-		state.loading = true
-	},
-	[types.LOADING_END] (state) {
-		state.loading = false
-	}
-}
-
-
-const inputMutations = {
 }
 
 
 
 export default {
-	state,
-	mutations: {
-		...baseMutations,
-		...statusMutations,
-		...inputMutations
-	}
+	state: initalState,
+	mutations
 }

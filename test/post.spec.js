@@ -67,17 +67,17 @@ describe('get & insert & delete', function() {
 
 	it('get & delete success', async () => {
 		const posts = await getData('/u/posts', cookies)
-		const postId = posts[0]._id
-		const recievedData = await getData(`/post/${postId}`, cookies)
+		const postid = posts[0]._id
+		const recievedData = await getData(`/post/${postid}`, cookies)
 		expect(recievedData).to.be.deep.equal(post)
-		await request.del(`/post/${postId}`).set('cookie', cookies).expect(204)
+		await request.del(`/post/${postid}`).set('cookie', cookies).expect(204)
 	})
 
-	it('get fail, postId is not exists', async () => {
+	it('get fail, postid is not exists', async () => {
 		await request.get(`/post/${123456}`).set('cookie', cookies).expect(500)
 	})
 
-	it('delete fail, postId is not exists', async () => {
+	it('delete fail, postid is not exists', async () => {
 		await request.del(`/post/${123456}`).set('cookie', cookies).expect(500)
 	})
 })
