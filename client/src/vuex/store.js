@@ -2,25 +2,26 @@ import * as types from './types'
 import forums from 'src/conf/forums'
 import { clone } from 'src/utils'
 
-const initalPost = {
+const initialPost = {
 	text: '',
 	images: [],
 	tags: [],
 	comments: []
 }
 
-const initalComment = {
-	reply: 0,
+const initialComment = {
 	text: '',
 	images: []
 }
 
-const initalState = {
-	userinfo: {
-		username: '',
-		email: '',
-		password: ''
-	},
+const initialUser = {
+	username: '',
+	email: '',
+	password: ''
+}
+
+const initialState = {
+	userinfo: clone(initialUser),
 	status: {
 		anonymousName: '佚名',
 		authorizeVisible: true,
@@ -29,8 +30,8 @@ const initalState = {
 		logined: false
 	},
 	posts: [],
-	post: clone(initalPost),
-	comment: clone(initalComment),
+	post: clone(initialPost),
+	comment: clone(initialComment),
 	forums
 }
 
@@ -51,7 +52,6 @@ const mutations = {
 		state.post.text = value
 	},
 	[types.CHANGE_COMMENT_TEXT] (state, value) {
-		console.debug(value)
 		state.comment.text = value
 	},
 	[types.TOGGLE_EDITOR_VISIBLE] (state) {
@@ -65,22 +65,32 @@ const mutations = {
 	},
 	[types.ENTER_POST_FETCH_SUCCESS] (state, post) {
 		state.posts.push(clone(post))
-		state.post = clone(initalPost)
+		state.post = clone(initialPost)
 		console.debug(state.post)
 	},
-	[types.ENTER_COMMENT_FETCH_SUCCESS] (state, [comment, index]) {
-		state.posts[index].comments.push(clone(comment))
-		state.comment = clone(initalComment)
+	[types.ENTER_COMMENT_FETCH_SUCCESS] (state, [comment, postIndex]) {
+		state.posts[postIndex].comments.push(clone(comment))
+		state.comment = clone(initialComment)
 	},
-	[types.LOGINED] (state, user) {
+	[types.DELETE_POST_FETCH_SUCCESS] (state, postIndex) {
+		state.posts.splice(postIndex, 1)
+	},
+	[types.DELETE_COMMENT_FETCH_SUCCESS] (state, [postIndex, commentIndex]) {
+		state.posts[postIndex].comments.splice(commentIndex, 1)
+	},
+	[types.LOGIN_SUCCESS] (state, user) {
 		state.status.logined = true
 		state.userinfo = clone(state.userinfo, user)
+	},
+	[types.LOGOUT_SUCCESS] (state) {
+		state.status.logined = false
+		state.userinfo = clone(initialUser)
 	}
 }
 
 
 
 export default {
-	state: initalState,
+	state: initialState,
 	mutations
 }

@@ -3,24 +3,26 @@
 		<div class="col" v-for="posts in cols">
 			<a-post
 				class="post"
-				v-for="(post, index) in posts"
+				v-for="post in posts"
 				:admin="admin"
-				:index="post._id"
+				:id="post._id"
 				:username="post.username"
 				:agent="post.agent"
 				:created-time="post.createdTime"
 				:text="post.text"
 				@review="changeCommentText($event.target.value)"
-				@send="enterCommentFetch([post._id, comment, index])"
+				@send="enterCommentFetch([post._id, comment, post.index])"
+				@remove="deletePostFetch([post._id, post.index])"
 				>
 				<a-comment
 					v-for="comment in getTopTwoComments(post.comments)"
-					:index="comment.index"
+					:id="comment._id"
 					:reply="comment.reply"
 					:username="comment.username"
 					:agent="comment.agent"
 					:created-time="comment.createdTime"
 					:text="comment.text"
+					@remove="deleteCommentFetch([post._id, post.index, comment._id, comment.index])"
 					>
 				</a-comment>
 				<div v-if="getRestCommentsNumber(post.comments)">
@@ -34,23 +36,25 @@
 					<a-comment
 						v-show="restCommentVisible"
 						v-for="comment in getRestComments(post.comments)"
-						:index="comment.index"
+						:id="comment._id"
 						:reply="comment.reply"
 						:username="comment.username"
 						:agent="comment.agent"
 						:created-time="comment.createdTime"
 						:text="comment.text"
+						@remove="deleteCommentFetch([post._id, post.index, comment._id, comment.index])"
 						>
 					</a-comment>
 				</div>
 				<a-comment
 					v-for="comment in getLastTwoComments(post.comments)"
-					:index="comment.index"
+					:id="comment._id"
 					:reply="comment.reply"
 					:username="comment.username"
 					:agent="comment.agent"
 					:created-time="comment.createdTime"
 					:text="comment.text"
+					@remove="deleteCommentFetch([post._id, post.index, comment._id, comment.index])"
 					>
 				</a-comment>
 			</a-post>
@@ -82,10 +86,13 @@ export default {
 	computed: {
 		...mapState(['posts', 'comment']),
 		...mapState({
-			admin: state => state.userinfo.role === Infinity
+			role: state => state.userinfo.role
 		}),
+		admin() {
+			return this.role === 1123
+		},
 		cols() {
-			let posts, cols = [], columnNumber, i, j
+			let posts, post, comments, cols = [], columnNumber, i, j
 			posts = this.posts
 			columnNumber = this.column
 
@@ -93,15 +100,22 @@ export default {
 			for (i = 0; i < columnNumber; i++)
 				cols[i] = []
 
-			// 分发文章到各个列中
-			for (j = 0; j < posts.length; j++)
-				cols[j % columnNumber].push(posts[j])
+			// 分发文章到各个列中, 并给文章和评论设置索引index
+			for (i = 0; i < posts.length; i++) {
+				post = posts[i]
+				post.index = i
+				comments = post.comments
+				for (j = 0; j < comments.length; j++) {
+					comments[j].index = j
+				}
+				cols[i % columnNumber].push(post)
+			}
 
 			return cols
 		}
 	},
 	methods: {
-		...mapActions(['enterCommentFetch', 'changeCommentText', 'getPosts']),
+		...mapActions(['enterCommentFetch', 'changeCommentText', 'getPostsFetch', 'deletePostFetch', 'deleteCommentFetch']),
 		getTopTwoComments(arr) {
 			return arr.slice(0, 2)
 		},
@@ -122,7 +136,7 @@ export default {
 		}
 	},
 	created() {
-		this.getPosts('综合版1')
+		this.getPostsFetch('综合版1')
 	},
 	mounted() {
 		const waterfall = this.$refs.waterfall

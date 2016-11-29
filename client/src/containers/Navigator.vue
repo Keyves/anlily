@@ -6,7 +6,7 @@
 			<c-button color="ghost" icon="search"></c-button>
 			<c-button color="ghost" icon="email"></c-button>
 			<c-button color="ghost" icon="settings"></c-button>
-			<c-button color="ghost" @click="handleClick">LOGOUT</c-button>
+			<c-button color="ghost" @click="logout">LOGOUT</c-button>
 		</div>
 		<div class="btn-group" v-show="!logined">
 			<c-button color="ghost" icon="account_circle" @click="toggleAuthorizeVisible"></c-button>
@@ -25,10 +25,7 @@ export default {
 		})
 	},
 	methods: {
-		...mapActions(['toggleAuthorizeVisible']),
-		handleClick() {
-			fetch('http://localhost:4000/u/logout')
-		}
+		...mapActions(['toggleAuthorizeVisible', 'logout'])
 	}
 }
 </script>

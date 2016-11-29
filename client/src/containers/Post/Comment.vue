@@ -1,13 +1,10 @@
 <template>
 	<div class="comment">
 		<div class="header">
-			<span class="index secondary">{{'#' + index}}</span>
+			<span class="id secondary">{{'#' + id}}</span>
 			<span class="username">{{username}}</span>
 			<span class="created-time secondary">{{distanceNow}}</span>
-			<span class="reply secondary" v-if="reply">
-				<c-icon type="keyboard_arrow_right"></c-icon>
-				<span>{{reply}}</span>
-			</span>
+			<c-button class="btn delete" icon-color="error" icon="delete" @click="remove"></c-button>
 		</div>
 		<div class="section">
 			<div class="text">{{text}}</div>
@@ -21,8 +18,7 @@ import DateLib from 'src/lib/DateLib'
 export default {
 	name: 'a-comment',
 	props: {
-		index: Number,
-		reply: Number,
+		id: Number,
 		username: String,
 		createdTime: String,
 		text: String
@@ -30,6 +26,11 @@ export default {
 	computed: {
 		distanceNow() {
 			return DateLib.getDistanceNow(new Date(this.createdTime))
+		}
+	},
+	methods: {
+		remove(e) {
+			this.$emit('remove', e)
 		}
 	}
 }
@@ -47,6 +48,19 @@ $small-spacing: 5px;
 
 	&:hover {
 		background: #ddd;
+
+		& .created-time {
+			display: none;
+		}
+
+		& .btn.delete {
+			display: block;
+			padding: 0;
+		}
+	}
+
+	& .btn.delete {
+		display: none;
 	}
 
 	& > .header {
@@ -59,16 +73,7 @@ $small-spacing: 5px;
 
 		& > .username {
 			padding: 0 $spacing;
-		}
-
-		& > .created-time {
 			flex: 1;
-			text-align: right;
-		}
-
-		& > .reply {
-			display: flex;
-			align-items: center;
 		}
 	}
 

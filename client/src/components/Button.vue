@@ -1,6 +1,6 @@
 <template>
 	<button class="c-button" :class="oClass" :type="type" :style="oStyle" @click="handleClick">
-		<c-icon :type="icon" :color="iconColor" v-if="icon"></c-icon>
+		<c-icon :icon="icon" :color="iconColor" v-if="icon"></c-icon>
 		<slot></slot>
 	</button>
 </template>
@@ -32,22 +32,19 @@ export default {
 			this.$emit('click', e)
 		}
 	},
-	computed: {
-		oClass() {
-			const color = this.color
-			let className = this.class
-			if (!(color.indexOf('#') > -1)) {
-				className += ' c-button-' + color
-			}
-			return className
-		},
-		oStyle() {
-			const color = this.color
-			const style = this.style
-			if (color.indexOf('#') > -1) {
-				style.color = color
-			}
-			return style
+	data() {
+		const color = this.color
+		const oStyle = this.style
+		let oClass = this.class
+
+		if (color.indexOf('#') > -1) {
+			oStyle.color = color
+		} else {
+			oClass = [oClass, 'c-button-' + color].join(' ')
+		}
+		return {
+			oStyle,
+			oClass
 		}
 	},
 	components: {

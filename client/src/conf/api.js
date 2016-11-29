@@ -4,5 +4,6 @@ export default {
 	post: `${HOST}/post`,
 	user: `${HOST}/u`,
 	login: `${HOST}/u/login`,
+	logout: `${HOST}/u/logout`,
 	register: `${HOST}/u/register`
 }

@@ -46,9 +46,9 @@ const postDriver = {
 
 	async insert(post) {
 		try {
-			const fullPost = await new PostModel(post)
-			await fullPost.save()
-			return fullPost
+			const _post = await new PostModel(post)
+			await _post.save()
+			return _post
 		} catch(e) {
 			e.message = `insert post failed - ${e.message}`
 			throw e
@@ -57,19 +57,20 @@ const postDriver = {
 
 	async insertComment(postid, comment) {
 		try {
-			const fullPost = await PostModel.findOne({_id: postid})
-			if (fullPost) {
-				const comments = fullPost.comments
+			const _post = await PostModel.findOne({_id: postid})
+			if (_post) {
+				const comments = _post.comments
 				// 获取列表最后一位元素的索引并加1
-				comment.index = comments.length > 0 ? comments[comments.length - 1].index + 1 : 1
+				comment._id = comments.length > 0 ? comments[comments.length - 1]._id + 1 : 1
 				comments.push(comment)
-				await fullPost.save()
+				await _post.save()
 
-				// 获取由mongoose创建的comment详细信息，如createdTime等
-				comment = comments[comments.length - 1]
-				const reply = comment.reply
-				if (reply) {
-					const username = comments[reply]
+				// [#Number ]
+				const reg = /#(\d+)\s/
+				const result = reg.exec(comment.text)
+				if (result) {
+					const reply = result[1]
+					const username = comments[reply].username
 					const user = await userDriver.findOneByUsername(username)
 					if (user) {
 						user.comments.push(comment)
@@ -77,7 +78,10 @@ const postDriver = {
 					}
 				}
 
-				return comment
+				// 获取由mongoose创建的comment详细信息，如createdTime等
+				const _comment = comments[comments.length - 1]
+
+				return _comment
 			} else {
 				throw new Error('被评论的文章不存在')
 			}
@@ -89,18 +93,19 @@ const postDriver = {
 
 	async removeByPostid(postid) {
 		try {
-			await PostModel.remove({postid})
+			await PostModel.remove({_id: postid})
 		} catch(e) {
 			e.message = `delete post failed - ${e.message}`
 			throw e
 		}
 	},
 
-	async removeCommentByPostidAndCommentIndex(postid, commentIndex) {
+	async removeCommentByPostidAndCommentid(postid, commentid) {
 		try {
-			const post = await postDriver.findOneByPostId(postid)
+			const post = await postDriver.findOneByPostid(postid)
 			if (post) {
-				post.comments.pull({index: commentIndex})
+				post.comments.pull({_id: commentid})
+				await post.save()
 			} else {
 				throw new Error('不存在该文章')
 			}

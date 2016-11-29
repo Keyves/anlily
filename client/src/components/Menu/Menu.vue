@@ -2,7 +2,7 @@
 	<div class="c-menu">
 		<div class="c-menu-title" @click="changeExpandStatus">
 			<span class="c-menu-title-text">{{text}}</span>
-			<c-icon type="expand_more" :style="{transform: this.expandStatus ? 'rotate(180deg)' : ''}"></c-icon>
+			<c-icon icon="expand_more" :style="{transform: this.expandStatus ? 'rotate(180deg)' : ''}"></c-icon>
 		</div>
 		<div class="c-menu-content" :class="this.expandStatus ? 'expand' : ''">
 			<slot></slot>

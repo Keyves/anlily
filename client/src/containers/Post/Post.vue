@@ -1,7 +1,7 @@
 <template>
 	<div class="article">
 		<div class="header" @click="changeExpandStatus">
-			<span class="index secondary">{{'#' + index}}</span>
+			<span class="id secondary">{{'#' + id}}</span>
 			<span class="username">{{username}}</span>
 			<span class="created-time secondary">{{distanceNow}}</span>
 			<span class="comment-number secondary">{{commentNumber}}</span>
@@ -16,7 +16,7 @@
 				<c-button icon="reply"></c-button>
 			</div>
 			<div class="right">
-				<c-button icon-color="error" icon="delete" v-if="admin"></c-button>
+				<c-button icon-color="error" icon="delete" v-if="admin" @click="remove"></c-button>
 				<c-button icon="message" @click="toggleInputboxVisible"></c-button>
 				<c-button icon="details"></c-button>
 			</div>
@@ -62,7 +62,7 @@ export default {
 	name: 'a-post',
 	props: {
 		admin: Boolean,
-		index: Number,
+		id: Number,
 		username: String,
 		commentNumber: Number,
 		createdTime: String,
@@ -100,7 +100,11 @@ export default {
 			this.$emit('review', e)
 		},
 		send(e) {
+			this.value = ''
 			this.$emit('send', e)
+		},
+		remove(e) {
+			this.$emit('remove', e)
 		}
 	},
 	created() {

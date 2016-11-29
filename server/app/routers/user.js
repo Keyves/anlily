@@ -3,6 +3,8 @@ const userDriver = require('../drivers/user')
 const refine = require('../utils/refine')
 const validateUser = require('../validators/user')
 
+const returnKeys = ['username', 'comments', 'createdTime', 'email', 'role', 'followers', 'following']
+
 router
 .patch('/', async (ctx) => {
 
@@ -13,8 +15,9 @@ router
 })
 .get('/login', async (ctx) => {
 	const user = ctx.session.user
+
 	if (user) {
-		ctx.body = refine(user, ['username', 'comments', 'createdTime', 'email', 'followers', 'following'])
+		ctx.body = refine(user, returnKeys)
 	} else {
 		ctx.status = 404
 	}
@@ -26,7 +29,7 @@ router
 
 	const user = await userDriver.login(userinfo)
 	ctx.session.user = user
-	ctx.status = 200
+	ctx.body = refine(user, returnKeys)
 })
 .post('/register', async (ctx) => {
 	const userinfo = refine(ctx.request.body, ['email', 'password'])
@@ -35,7 +38,7 @@ router
 
 	const user = await userDriver.register(userinfo)
 	ctx.session.user = user
-	ctx.status = 201
+	ctx.body = refine(user, returnKeys)
 })
 
 module.exports = router

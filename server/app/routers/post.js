@@ -21,14 +21,14 @@ router
 	post.ip = ctx.ip
 
 	const fullPost = await postDriver.insert(post)
-	ctx.body = refine(fullPost, ['index', 'createdTime', '_id'])
+	ctx.body = refine(fullPost, ['createdTime', '_id'])
 })
-.del('/:postid', async (ctx) => {
+.del('/', async (ctx) => {
 	const user = ctx.session.user
 
-	if (user && user.role === Infinity) {
-		const postid = ctx.params.postid
-		await postDriver.remove(postid)
+	if (user && user.role === 1123) {
+		const postid = ctx.query.postid
+		await postDriver.removeByPostid(postid)
 		ctx.status = 204
 	} else {
 		throw new Error('权限不足')
@@ -49,17 +49,21 @@ router
 	}
 	comment.ip = ctx.ip
 
-	// [#Number ]
-	const reg = /#(\d+)\s/
-	const result = reg.exec(comment.text)
-
-	if (result) {
-		comment.reply = result[1]
-	}
-
 	const fullComment = await postDriver.insertComment(postid, comment)
 
-	ctx.body = refine(fullComment, ['createdTime', 'reply', 'index'])
+	ctx.body = refine(fullComment, ['createdTime', 'reply', '_id'])
+})
+.del('/:postid/comment', async (ctx) => {
+	const user = ctx.session.user
+
+	if (user && user.role === 1123) {
+		const postid = ctx.params.postid
+		const commentid = ctx.query.commentid
+		await postDriver.removeCommentByPostidAndCommentid(postid, commentid)
+		ctx.status = 204
+	} else {
+		throw new Error('权限不足')
+	}
 })
 
 module.exports = router

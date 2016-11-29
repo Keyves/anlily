@@ -31,7 +31,7 @@ const userSchema = new Schema({
 	// 1: verified user
 	// 2: professonal user
 	// >10: admin
-	// >50: super admin
+	// 1123: super admin
 	role: {
 		type: Number,
 		default: 0

@@ -1,12 +1,12 @@
 <template>
-	<i class="c-icon material-icons" :class="oClass" :style="oStyle">{{type}}</i>
+	<i class="c-icon material-icons" :class="oClass" :style="oStyle">{{icon}}</i>
 </template>
 
 <script>
 export default {
 	name: 'c-icon',
 	props: {
-		type: {
+		icon: {
 			type: String,
 			required: true
 		},
@@ -23,23 +23,19 @@ export default {
 			default: ''
 		}
 	},
-	computed: {
-		oClass() {
-			const type = this.type
-			const color = this.color
-			let className = this.class
-			if (!(color.indexOf('#') > -1)) {
-				className = [className, 'c-icon-' + color].join(' ')
-			}
-			return className
-		},
-		oStyle() {
-			const color = this.color
-			const style = this.style
-			if (color.indexOf('#') > -1) {
-				style.color = color
-			}
-			return style
+	data() {
+		const color = this.color
+		const oStyle = this.style
+		let oClass = this.class
+
+		if (color.indexOf('#') > -1) {
+			oStyle.color = color
+		} else {
+			oClass = [oClass, 'c-icon-' + color].join(' ')
+		}
+		return {
+			oStyle,
+			oClass
 		}
 	}
 }
