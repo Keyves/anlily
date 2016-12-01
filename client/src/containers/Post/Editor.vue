@@ -1,8 +1,8 @@
 <template>
 	<div>
-		<c-button class="float-btn new-post" icon="edit" @click="toggleEditorVisible"></c-button>
-		<div class="editor" v-show="editorVisible">
-			<div class="editor-bg" @click="toggleEditorVisible"></div>
+		<c-button class="float-btn new-post" icon="edit" @click="togglePostEditorVisible"></c-button>
+		<div class="editor" v-show="postEditorVisible">
+			<div class="editor-bg" @click="togglePostEditorVisible"></div>
 			<div class="editor-main">
 				<div class="header">
 					<span class="username">{{logined ? userinfo.username : '佚名'}}</span>
@@ -28,13 +28,13 @@ export default {
 	computed: {
 		...mapState(['post', 'userinfo']),
 		...mapState({
-			editorVisible: state => state.status.editorVisible,
+			postEditorVisible: state => state.status.postEditorVisible,
 			category: state => state.status.category,
 			logined: state => state.status.logined
 		})
 	},
 	methods: {
-		...mapActions(['changePostText', 'enterPostFetch', 'toggleEditorVisible'])
+		...mapActions(['changePostText', 'enterPostFetch', 'togglePostEditorVisible'])
 	}
 }
 </script>

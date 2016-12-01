@@ -16,13 +16,44 @@ export const changeEmailText = ({commit}, value) => {
 	commit(types.CHANGE_EMAIL_TEXT, value)
 }
 
+export const readyReport = ({commit}, [suspectid, postid, text]) => {
+	commit(types.READY_REPORT, [suspectid, postid, text])
+	commit(types.TOGGLE_REPORT_EDITOR_VISIBLE)
+}
+
+export const changeReportType = ({commit}, value) => {
+	commit(types.CHANGE_REPORT_TYPE, value)
+}
+
+export const changeReportDescription = ({commit}, value) => {
+	commit(types.CHANGE_REPORT_DESCRIPTION, value)
+}
+
+export const enterReportFetch = async ({commit}, report) => {
+	try {
+		const data = await fetchAPI(api.report, 'post', report)
+		Object.assign(report, data)
+
+		commit(types.ENTER_REPORT_FETCH_SUCCESS, report)
+		commit(types.TOGGLE_REPORT_EDITOR_VISIBLE)
+		notice('举报成功')
+	} catch(e) {
+		notice('举报失败，原因：' + e.message)
+		throw e
+	}
+}
+
+export const toggleReportEditorVisible = ({commit}) => {
+	commit(types.TOGGLE_REPORT_EDITOR_VISIBLE)
+}
+
 export const register = async ({commit}, userinfo) => {
 	try {
 		const user = await fetchAPI(api.register, 'post', userinfo)
 
-		notice('注册成功')
 		commit(types.LOGIN_SUCCESS, user)
 		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
+		notice('注册成功')
 	} catch(e) {
 		notice('注册失败，原因：' + e.message)
 		throw e
@@ -35,6 +66,7 @@ export const getLoginedUser = async ({commit}) => {
 
 		commit(types.LOGIN_SUCCESS, user)
 		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
+		notice('登录成功')
 	} catch(e) {
 		throw e
 	}
@@ -44,9 +76,9 @@ export const login = async ({commit}, userinfo) => {
 	try {
 		const user = await fetchAPI(api.login, 'post', userinfo)
 
-		notice('登录成功')
 		commit(types.LOGIN_SUCCESS, user)
 		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
+		notice('登录成功')
 	} catch(e) {
 		notice('登录失败，原因：' + e.message)
 		throw e
@@ -56,8 +88,9 @@ export const login = async ({commit}, userinfo) => {
 export const logout = async ({commit}) => {
 	try {
 		await fetchAPI(api.logout, 'get')
-		notice('登出成功')
+
 		commit(types.LOGOUT_SUCCESS)
+		notice('登出成功')
 	} catch(e) {
 		notice('登出失败，原因：' + e.message)
 		throw e
@@ -80,9 +113,9 @@ export const enterPostFetch = async ({commit, dispatch}, [category, post]) => {
 		const data = await fetchAPI(api.post, 'post', post)
 		Object.assign(post, data)
 
-		notice('发表成功')
-		dispatch('toggleEditorVisible')
+		dispatch('togglePostEditorVisible')
 		commit(types.ENTER_POST_FETCH_SUCCESS, post)
+		notice('发表成功')
 	} catch(e) {
 		notice('发表失败，原因：' + e.message)
 		throw e
@@ -92,8 +125,9 @@ export const enterPostFetch = async ({commit, dispatch}, [category, post]) => {
 export const deletePostFetch = async ({commit}, [postid, postIndex]) => {
 	try {
 		await fetchAPI(api.post, 'delete', {postid})
-		notice('删除文章成功')
+
 		commit(types.DELETE_POST_FETCH_SUCCESS, postIndex)
+		notice('删除文章成功')
 	} catch(e) {
 		notice('删除文章失败，原因：' + e.message)
 		throw e
@@ -109,8 +143,8 @@ export const enterCommentFetch = async ({commit}, [postid, comment, postIndex]) 
 		const data = await fetchAPI([api.post, postid, 'comment'].join('/'), 'post', comment)
 		Object.assign(comment, data)
 
-		notice('评论成功')
 		commit(types.ENTER_COMMENT_FETCH_SUCCESS, [comment, postIndex])
+		notice('评论成功')
 	} catch(e) {
 		notice('评论失败，原因：' + e.message)
 		throw e
@@ -120,23 +154,22 @@ export const enterCommentFetch = async ({commit}, [postid, comment, postIndex]) 
 export const deleteCommentFetch = async ({commit}, [postid, postIndex, commentid, commentIndex]) => {
 	try {
 		await fetchAPI([api.post, postid, 'comment'].join('/'), 'delete', {commentid})
-		notice('删除评论成功')
+
 		commit(types.DELETE_COMMENT_FETCH_SUCCESS, [postIndex, commentIndex])
+		notice('删除评论成功')
 	} catch(e) {
 		notice('删除评论失败，原因：' + e.message)
 		throw e
 	}
 }
 
-export const toggleEditorVisible = ({commit}) => {
-	commit(types.TOGGLE_EDITOR_VISIBLE)
+export const togglePostEditorVisible = ({commit}) => {
+	commit(types.TOGGLE_POST_EDITOR_VISIBLE)
 }
 
 export const getPostsFetch = async ({commit}, category) => {
 	try {
-		const posts = await fetchAPI(api.post, 'get', {
-			category
-		})
+		const posts = await fetchAPI(api.post, 'get', {category})
 
 		commit(types.GET_POSTS, posts)
 	} catch(e) {
@@ -148,6 +181,7 @@ export const getPostsFetch = async ({commit}, category) => {
 export const changeCategoryAndGetPosts = async ({commit}, category) => {
 	try {
 		await getPostsFetch({commit}, category)
+
 		commit(types.CHANGE_CATEGORY, category)
 	} catch(e) {
 		notice('更改失败，原因：' + e.message)

@@ -1,38 +1,38 @@
 <template>
-	<div class="a-report-editor" v-show="true">
-		<div class="a-report-editor-bg" @click="toggleEditorVisible"></div>
+	<div class="a-report-editor" v-show="reportEditorVisible">
+		<div class="a-report-editor-bg" @click="toggleReportEditorVisible"></div>
 		<div class="a-report-editor-main">
 			<div class="header">
 				<div class="postid">
 					<div class="title">文章编号：</div>
-					<c-button class="content" color="default">{{postid}}</c-button>
+					<c-button class="content" color="default">{{report.postid}}</c-button>
 				</div>
 				<div class="suspectid">
 					<div class="title">嫌疑人：</div>
-					<c-button class="content" color="default">{{suspectid}}</c-button>
+					<c-button class="content" color="default">{{report.suspectid}}</c-button>
 				</div>
 			</div>
 			<div class="body">
 				<div class="types">
 					<span class="title">类型：</span>
 					<span class="content">
-						<span v-for="reportType in reportTypes" :class="reportType === type ? 'selected' : ''">{{reportType}}</span>
+						<span v-for="reportType in reportTypes" :class="reportType === type ? 'selected' : ''" @click="changeReportType(reportType)">{{report.type}}</span>
 					</span>
 				</div>
 				<div class="text">
 					<div class="title">内容：</div>
-					<div class="content secondary">{{text}}</div>
+					<div class="content secondary">{{report.text}}</div>
 				</div>
 				<div class="description">
 					<div class="title">描述：</div>
-					<textarea class="content" type="text" :value="description" placeholder="输入内容限100字..."></textarea>
+					<textarea class="content" type="text" :value="description" placeholder="输入内容限100字..." @input="changeReportDescription($event.target.value)"></textarea>
 				</div>
 			</div>
 			<div class="footer">
-				<span class="createdTime secondary">{{distanceNow}}</span>
+				<span class="createdTime secondary">{{report.distanceNow}}</span>
 				<span>
 					<c-button color="default">取消</c-button>
-					<c-button color="primary">确认</c-button>
+					<c-button color="primary" @click="enterReportFetch(report)">确认</c-button>
 				</span>
 			</div>
 		</div>
@@ -44,24 +44,14 @@ import { mapActions, mapState } from 'vuex'
 
 export default {
 	name: 'a-report-editor',
-	data() {
-		return {
-			suspectid: 1001,
-			reporterid: 1001,
-			postid: 1001,
-			// ['色情', '辱骂', '广告', '其它']
-			type: '广告',
-			description: '',
-			text: 'whta',
-			createdTime: new Date(),
-			reportTypes: ['色情', '辱骂', '广告', '其它']
-		}
-	},
 	computed: {
-		...mapState(['post', 'userinfo'])
+		...mapState(['report']),
+		...mapState({
+			reportEditorVisible: state => state.status.reportEditorVisible
+		})
 	},
 	methods: {
-		...mapActions(['changePostText', 'enterPostFetch', 'toggleEditorVisible'])
+		...mapActions(['toggleReportEditorVisible', 'changeReportType', 'changeReportDescription', 'enterReportFetch'])
 	}
 }
 </script>
