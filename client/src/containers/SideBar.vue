@@ -1,5 +1,5 @@
 <template>
-<div class="sidebar">
+<div class="a-sidebar">
 	<c-menu v-for="item in forums" :text="item.name" :expand="item.expand">
 		<c-menu-item
 			v-for="category in item.categorys"
@@ -9,6 +9,8 @@
 			{{category}}
 		</c-menu-item>
 	</c-menu>
+	<c-button class="a-sidebar-item">值班室</c-button>
+	<c-button class="a-sidebar-item">布告栏</c-button>
 </div>
 </template>
 
@@ -44,8 +46,16 @@ export default {
 <style lang="scss">
 @import "~src/variables";
 
-.sidebar {
+.a-sidebar {
 	background: white;
 	box-shadow: 0 0 5px $shadow-color;
+
+	& > &-item {
+	    display: block;
+	    font-size: 13px;
+		padding: 10px;
+	    width: 100%;
+	    text-align: left;
+	}
 }
 </style>

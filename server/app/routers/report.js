@@ -1,19 +1,16 @@
 const router = require('koa-router')()
 const refine = require('../utils/refine')
-
+const requireRole = require('../utils/requireRole')
 
 
 router
-.patch('/', async (ctx) => {
-
-})
 .get('/', async (ctx) => {
 	ctx.session = null
 	ctx.status = 200
 })
 .post('/', async (ctx) => {
 })
-.del('/', async (ctx) => {
+.del('/', requireRole(1123), async (ctx) => {
 
 })
 

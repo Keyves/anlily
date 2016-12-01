@@ -1,5 +1,5 @@
 <template>
-	<div class="waterfall" ref="waterfall">
+	<div class="a-waterfall" ref="waterfall">
 		<div class="col" v-for="posts in cols">
 			<a-post
 				class="post"
@@ -70,6 +70,7 @@ import Post from './Post'
 const Comment = Post.Comment
 
 export default {
+	name: 'a-waterfall',
 	props: {
 		columnWidth: {
 			type: Number,
@@ -167,7 +168,7 @@ export default {
 <style lang="scss">
 @import "~src/variables";
 
-.waterfall {
+.a-waterfall {
 	overflow: hidden;
 	display: flex;
 	min-width: 500px;

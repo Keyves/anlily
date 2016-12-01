@@ -13,7 +13,4 @@ export default [{
 }, {
     name : '三次元',
     categorys : ['电', '摄影', '军武', '体育', '天台(股票)']
-}, {
-    name : '管理',
-    categorys : ['值班室']
 }]

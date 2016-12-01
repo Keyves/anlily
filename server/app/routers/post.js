@@ -1,6 +1,7 @@
 const router = require('koa-router')()
 const postDriver = require('../drivers/post')
 const refine = require('../utils/refine')
+const requireRole = require('../utils/requireRole')
 
 router
 .get('/', async (ctx) => {
@@ -23,17 +24,10 @@ router
 	const fullPost = await postDriver.insert(post)
 	ctx.body = refine(fullPost, ['createdTime', '_id'])
 })
-.del('/', async (ctx) => {
-	const user = ctx.session.user
-
-	if (user && user.role === 1123) {
-		const postid = ctx.query.postid
-		await postDriver.removeByPostid(postid)
-		ctx.status = 204
-	} else {
-		throw new Error('权限不足')
-	}
-
+.del('/', requireRole(1123), async (ctx) => {
+	const postid = ctx.query.postid
+	await postDriver.removeByPostid(postid)
+	ctx.status = 204
 })
 .post('/:postid/comment', async (ctx) => {
 	const user = ctx.session.user

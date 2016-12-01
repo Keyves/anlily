@@ -61,10 +61,8 @@ export default {
 	-webkit-mask-image: -webkit-radial-gradient(circle, white, black);
 	outline: none;
 	border: none;
-    display: flex;
-    justify-content: center;
-	align-items: center;
     padding: 5px 15px;
+	text-align: center;
 	border-radius: 3px;
     text-decoration: none;
     color: #666;
