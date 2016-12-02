@@ -1,7 +1,7 @@
-export default function requireRole(role) {
+module.exports = function requireRole(role) {
     return async function(ctx, next) {
 		var user = ctx.session.user
-		
+
         if (user && user.role === role)
             next();
         else

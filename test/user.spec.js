@@ -1,58 +1,121 @@
 const supertest = require('supertest')
+const api = require('./utils/api')
+const clone = require('./utils/clone')
+const getCookies = require('./utils/getCookies')
 const app = require('../server/app')
-const UserModel = require('../server/app/models/user')
-const chai = require('chai')
-const expect = chai.expect
+const UserModel = require('../server/src/models/user')
 
 process.env.NODE_ENV = 'test'
 
-const request = supertest.agent(app.listen())
-
-//
-// describe('find', async () => {
-//
-// })
-
-
-describe('register', async () => {
+describe('user', () => {
+	const request = supertest.agent(app.listen())
 	const data = {
-		username: 'username@gmail.com',
-		password: 'password'
+		email: 'username@gmail.com',
+		password: 'password123456'
 	}
 
-	after(async () => {
-		await UserModel.remove({username: data.username})
+	describe('register', async () => {
+		after(async () => {
+			await UserModel.remove({email: data.email})
+		})
+
+		it('success', async () => {
+			await request.post(api.register).send(data).expect(200)
+		})
+
+		it('fail, account has existed', async () => {
+			await request.post(api.register).send(data).expect(401)
+		})
+
+		it('fail, email is invaild', async () => {
+			let handleData, email, errorSamples = ['what', 'csahvnlii.com', '123123/@a.com']
+
+			for (email of errorSamples) {
+				handleData = clone(data, {email})
+				await request.post(api.register).send(handleData).expect(401)
+			}
+		})
+
+		it('fail, password is invalid', async () => {
+			let handleData, password, errorSamples = ['1231', 'snvdio', '.dvsa', '123.']
+
+			for (password of errorSamples) {
+				handleData = clone(data, {password})
+				await request.post(api.register).send(handleData).expect(401)
+			}
+		})
 	})
 
-	it('success', async () => {
-		await request.post('/u/register').send(data).expect(204)
+	describe('login post', async () => {
+		before(async () => {
+			await request.post(api.register).send(data)
+		})
+
+		after(async () => {
+			await UserModel.remove({email: data.email})
+		})
+
+		it('success', async () => {
+			await request.post(api.login).send(data).expect(200)
+		})
+
+		it('fail, email is invaild', async () => {
+			let handleData, email, errorSamples = ['what', 'csahvnlii.com', '123123/@a.com']
+
+			for (email of errorSamples) {
+				handleData = clone(data, {email})
+				await request.post(api.login).send(handleData).expect(401)
+			}
+		})
+
+		it('fail, password is invalid', async () => {
+			let handleData, password, errorSamples = ['1231', 'snvdio', '.dvsa', '123.']
+
+			for (password of errorSamples) {
+				handleData = clone(data, {password})
+				await request.post(api.login).send(handleData).expect(401)
+			}
+		})
 	})
 
-	it('fail, account has existed', async () => {
-		await request.post('/u/register').send(data).expect(401)
-	})
-})
+	describe('login get', async () => {
+		before(async () => {
+			await getCookies(request, data)
+		})
 
-describe('login', async () => {
-	const data = {
-		username: 'username@gmail.com',
-		password: 'password'
-	}
+		after(async () => {
+			await UserModel.remove({email: data.email})
+			await request.get(api.logout)
+		})
 
-	before(async () => {
-		await request.post('/u/register').send(data).expect(204)
-	})
+		it('success, with cookie', async () => {
+			await request.get(api.login).expect(200)
+		})
 
-	after(async () => {
-		await UserModel.remove({username: data.username})
-	})
-
-	it('success', async () => {
-		await request.post('/u/login').send(data).expect(204)
+		it('fail, without cookie', async () => {
+			// 清除request自带的cookie
+			await request.get(api.login).set('cookie', '').expect(404)
+		})
 	})
 
-	it('fail, invalid password', async () => {
-		data.password = 'other'
-		await request.post('/u/login').send(data).expect(401)
+
+	describe('logout get', async () => {
+		before(async () => {
+			await getCookies(request, data)
+		})
+
+		after(async () => {
+			await UserModel.remove({email: data.email})
+		})
+
+		it('success, with cookie', async () => {
+			await request.get(api.logout).expect(200)
+		})
+
+		it('fail, without cookie', async () => {
+			await request.get(api.logout)
+			// 等过检验是否存在登录中的用户来判断是否登出
+			await request.get(api.login).expect(404)
+		})
 	})
 })

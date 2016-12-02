@@ -4,10 +4,10 @@ const convert = require('koa-convert')
 const session = require('koa-generic-session')
 const json = require('koa-json')
 const bodyparser = require('koa-bodyparser')()
-const logger = require('koa-logger')
 const cors = require('koa-cors')
 const mongoose = require('mongoose')
 const autoIncrement = require('mongoose-auto-increment')
+const bunyan = require('bunyan')
 
 console.error = console.debug = function() {
 	console.log.apply(console, ['\n\x1b[31m', ...Array.prototype.slice.apply(arguments).map(v => v && typeof v === 'object' ? JSON.parse(JSON.stringify(v)) : v), '\x1b[0m\n'])
@@ -23,8 +23,9 @@ mongoose.connect('127.0.0.1', NAME)
 mongoose.connection.on('error', (err) => console.log(err))
 autoIncrement.initialize(mongoose.connection)
 
-const router = require('./app/routers')
+const router = require('./src/routers')
 const handleError = require('./middlewares/handleError')
+const handleLog = require('./middlewares/handleLog')
 
 
 // middlewares
@@ -41,8 +42,9 @@ app.use(convert(cors({
 })))
 
 if (process.env.NODE_ENV !== 'test') {
-	app.use(convert(logger()))
-	app.on('error', (err) => console.log(`\n\x1b[41m${err}\x1b[0m\n`))
+	const logger = bunyan.createLogger({name: NAME})
+	app.use(handleLog(logger.info.bind(logger)))
+	app.on('error', logger.error.bind(logger))
 } else {
 	app.on('error', () => {})
 }

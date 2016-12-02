@@ -2,7 +2,9 @@ const slice = Array.prototype.slice
 const assign = Object.assign
 
 export default function clone() {
-    return JSON.parse(JSON.stringify(slice.call(arguments).reduce((p, v) => assign(p, v))))
+	var args = slice.call(arguments)
+	args.unshift({})
+    return JSON.parse(JSON.stringify(assign.apply(Object, args)))
 }
 
 function deepClone(objectToBeCloned) {

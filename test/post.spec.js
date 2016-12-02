@@ -1,3 +1,5 @@
+/*
+
 const supertest = require('supertest')
 const mockgoose = require('mockgoose')
 const mongoose = require('mongoose')
@@ -9,22 +11,6 @@ process.env.NODE_ENV = 'test'
 
 const request = supertest.agent(app.listen())
 
-const login = (() => {
-	const userinfo = {
-		username: 'mock@gmail.com',
-		password: 'password'
-	}
-	let cookies = null
-
-	return async () => {
-		if (!cookies) {
-			await request.post('/u/register').send(userinfo).expect(201)
-			const res = await request.post('/u/login').send(userinfo).expect(204)
-			cookies = res.headers['set-cookie']
-		}
-		return cookies
-	}
-})()
 
 
 async function getData(path, cookies) {
@@ -82,7 +68,7 @@ describe('get & insert & delete', function() {
 	})
 })
 
-/*
+
 describe('update', async () => {
 	before(async () => {
 		await login()

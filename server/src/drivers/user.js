@@ -18,15 +18,6 @@ async function getUniqueUsername() {
 
 
 const userDriver = {
-
-	/**
-	 * 查找用户
-	 * @param  {String} username 用户名
-	 */
-	async findOneByUsername(username) {
-		return await UserModel.findOne({username})
-	},
-
 	/**
 	 * 注册
 	 * @param  {Object} user 用户信息

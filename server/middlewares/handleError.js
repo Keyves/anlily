@@ -1,7 +1,7 @@
-const { AuthorizeError } = require('../app/errors')
+const { AuthorizeError } = require('../src/errors')
 
 
-function handleError() {
+module.exports = function handleError() {
 	return async (ctx, next) => {
 		try {
 			await next()
@@ -33,9 +33,7 @@ function handleError() {
 				code: ctx.status,
 				message: e.message || '服务器错误'
 			}
-			ctx.app.emit('error', e.message, this)
+			ctx.app.emit('error', e.message, ctx)
 		}
 	}
 }
-
-module.exports = handleError
