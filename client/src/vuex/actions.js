@@ -4,6 +4,57 @@ import { fetchAPI } from 'src/utils'
 import { Notification } from 'src/components'
 const notice = Notification.notice
 
+// status
+export const getLoginedUser = async ({commit}) => {
+	try {
+		const user = await fetchAPI(api.login, 'get')
+
+		commit(types.LOGIN_SUCCESS, user)
+		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
+		notice('登录成功')
+	} catch(e) {
+		throw e
+	}
+}
+
+export const logout = async ({commit}) => {
+	try {
+		await fetchAPI(api.logout, 'get')
+
+		commit(types.LOGOUT_SUCCESS)
+		notice('登出成功')
+	} catch(e) {
+		notice('登出失败，原因：' + e.message)
+		throw e
+	}
+}
+
+export const toggleAuthorizeVisible = ({commit}) => {
+	commit(types.TOGGLE_AUTHORIZE_VISIBLE)
+}
+
+export const changeCategoryAndGetPosts = async ({commit}, category) => {
+	try {
+		await getPostsFetch({commit}, category)
+
+		commit(types.CHANGE_CATEGORY, category)
+	} catch(e) {
+		notice('更改失败，原因：' + e.message)
+		throw e
+	}
+}
+
+export const togglePostEditorVisible = ({commit}) => {
+	commit(types.TOGGLE_POST_EDITOR_VISIBLE)
+}
+
+export const toggleReportEditorVisible = ({commit}) => {
+	commit(types.TOGGLE_REPORT_EDITOR_VISIBLE)
+}
+
+
+
+// user
 export const changeUsernameText = ({commit}, value) => {
 	commit(types.CHANGE_USERNAME_TEXT, value)
 }
@@ -14,6 +65,44 @@ export const changePasswordText = ({commit}, value) => {
 
 export const changeEmailText = ({commit}, value) => {
 	commit(types.CHANGE_EMAIL_TEXT, value)
+}
+
+export const register = async ({commit}, userinfo) => {
+	try {
+		const user = await fetchAPI(api.register, 'post', userinfo)
+
+		commit(types.LOGIN_SUCCESS, user)
+		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
+		notice('注册成功')
+	} catch(e) {
+		notice('注册失败，原因：' + e.message)
+		throw e
+	}
+}
+
+export const login = async ({commit}, userinfo) => {
+	try {
+		const user = await fetchAPI(api.login, 'post', userinfo)
+
+		commit(types.LOGIN_SUCCESS, user)
+		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
+		notice('登录成功')
+	} catch(e) {
+		notice('登录失败，原因：' + e.message)
+		throw e
+	}
+}
+
+
+// report
+export const getReportsFetch = async ({commit}) => {
+	try {
+		const reports = fetchAPI(api.report, 'get')
+		commit(types.GET_REPORTS_FETCH_SUCCESS, reports)
+	} catch(e) {
+		notice('获取举报函失败：' + e.message)
+		throw e
+	}
 }
 
 export const readyReport = ({commit}, [suspectid, postid, text]) => {
@@ -43,64 +132,24 @@ export const enterReportFetch = async ({commit}, report) => {
 	}
 }
 
-export const toggleReportEditorVisible = ({commit}) => {
-	commit(types.TOGGLE_REPORT_EDITOR_VISIBLE)
+export const cancelReportFetch = async ({commit, dispatch}) => {
+	commit(types.INIT_REPORT)
+	dispatch('toggleReportEditorVisible')
 }
 
-export const register = async ({commit}, userinfo) => {
-	try {
-		const user = await fetchAPI(api.register, 'post', userinfo)
 
-		commit(types.LOGIN_SUCCESS, user)
-		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
-		notice('注册成功')
+
+// post
+export const getPostsFetch = async ({commit}, category) => {
+	try {
+		const posts = await fetchAPI(api.post, 'get', {category})
+
+		commit(types.GET_POSTS_FETCH_SUCCESS, posts)
 	} catch(e) {
-		notice('注册失败，原因：' + e.message)
+		notice('获取失败，原因：' + e.message)
 		throw e
 	}
 }
-
-export const getLoginedUser = async ({commit}) => {
-	try {
-		const user = await fetchAPI(api.login, 'get')
-
-		commit(types.LOGIN_SUCCESS, user)
-		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
-		notice('登录成功')
-	} catch(e) {
-		throw e
-	}
-}
-
-export const login = async ({commit}, userinfo) => {
-	try {
-		const user = await fetchAPI(api.login, 'post', userinfo)
-
-		commit(types.LOGIN_SUCCESS, user)
-		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
-		notice('登录成功')
-	} catch(e) {
-		notice('登录失败，原因：' + e.message)
-		throw e
-	}
-}
-
-export const logout = async ({commit}) => {
-	try {
-		await fetchAPI(api.logout, 'get')
-
-		commit(types.LOGOUT_SUCCESS)
-		notice('登出成功')
-	} catch(e) {
-		notice('登出失败，原因：' + e.message)
-		throw e
-	}
-}
-
-export const toggleAuthorizeVisible = ({commit}) => {
-	commit(types.TOGGLE_AUTHORIZE_VISIBLE)
-}
-
 
 export const changePostText = ({commit}, value) => {
 	commit(types.CHANGE_POST_CONTENT, value)
@@ -120,6 +169,11 @@ export const enterPostFetch = async ({commit, dispatch}, [category, post]) => {
 		notice('发表失败，原因：' + e.message)
 		throw e
 	}
+}
+
+export const cancelPostFetch = async ({commit, dispatch}) => {
+	commit(types.INIT_POST)
+	dispatch('togglePostEditorVisible')
 }
 
 export const deletePostFetch = async ({commit}, [postid, postIndex]) => {
@@ -159,32 +213,6 @@ export const deleteCommentFetch = async ({commit}, [postid, postIndex, commentid
 		notice('删除评论成功')
 	} catch(e) {
 		notice('删除评论失败，原因：' + e.message)
-		throw e
-	}
-}
-
-export const togglePostEditorVisible = ({commit}) => {
-	commit(types.TOGGLE_POST_EDITOR_VISIBLE)
-}
-
-export const getPostsFetch = async ({commit}, category) => {
-	try {
-		const posts = await fetchAPI(api.post, 'get', {category})
-
-		commit(types.GET_POSTS, posts)
-	} catch(e) {
-		notice('获取失败，原因：' + e.message)
-		throw e
-	}
-}
-
-export const changeCategoryAndGetPosts = async ({commit}, category) => {
-	try {
-		await getPostsFetch({commit}, category)
-
-		commit(types.CHANGE_CATEGORY, category)
-	} catch(e) {
-		notice('更改失败，原因：' + e.message)
 		throw e
 	}
 }

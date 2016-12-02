@@ -10,6 +10,7 @@
 				:agent="post.agent"
 				:created-time="post.createdTime"
 				:text="post.text"
+				@report="readyReport([post.userid, post._id, post.text])"
 				@review="changeCommentText($event.target.value)"
 				@send="enterCommentFetch([post._id, comment, post.index])"
 				@remove="deletePostFetch([post._id, post.index])"
@@ -116,7 +117,7 @@ export default {
 		}
 	},
 	methods: {
-		...mapActions(['enterCommentFetch', 'changeCommentText', 'getPostsFetch', 'deletePostFetch', 'deleteCommentFetch']),
+		...mapActions(['enterCommentFetch', 'changeCommentText', 'getPostsFetch', 'deletePostFetch', 'deleteCommentFetch', 'readyReport']),
 		getTopTwoComments(arr) {
 			return arr.slice(0, 2)
 		},

@@ -85,7 +85,11 @@ const statusMutations = {
 }
 
 const postMutations = {
-	[types.GET_POSTS] (state, posts) {
+	[types.INIT_POST] (state) {
+		state.post = clone(initialPost)
+	},
+	[types.GET_POSTS_FETCH_SUCCESS] (state, posts) {
+		console.debug(posts)
 		state.posts = posts
 	},
 	[types.CHANGE_POST_CONTENT] (state, value) {
@@ -111,7 +115,10 @@ const postMutations = {
 }
 
 const reportMutations = {
-	[types.GET_POSTS] (state, reports) {
+	[types.INIT_REPORT] (state) {
+		state.report = clone(initialReport)
+	},
+	[types.GET_REPORTS_FETCH_SUCCESS] (state, reports) {
 		state.reports = reports
 	},
 	[types.READY_REPORT] (state, [suspectid, postid, text]) {
@@ -129,7 +136,12 @@ const reportMutations = {
 	}
 }
 
-
+console.log({
+	...userMutations,
+	...statusMutations,
+	...postMutations,
+	...reportMutations
+})
 
 export default {
 	state: initialState,

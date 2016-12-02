@@ -1,6 +1,6 @@
 <template>
 	<div class="a-report-editor" v-show="reportEditorVisible">
-		<div class="a-report-editor-bg" @click="toggleReportEditorVisible"></div>
+		<div class="a-report-editor-bg" @click="cancelReportFetch"></div>
 		<div class="a-report-editor-main">
 			<div class="header">
 				<div class="postid">
@@ -16,22 +16,22 @@
 				<div class="types">
 					<span class="title">类型：</span>
 					<span class="content">
-						<span v-for="reportType in reportTypes" :class="reportType === type ? 'selected' : ''" @click="changeReportType(reportType)">{{report.type}}</span>
+						<span v-for="reportType in reportTypes" :class="reportType === report.type ? 'selected' : ''" @click="changeReportType(reportType)">{{reportType}}</span>
 					</span>
 				</div>
 				<div class="text">
 					<div class="title">内容：</div>
-					<div class="content secondary">{{report.text}}</div>
+					<div class="content">{{report.text}}</div>
 				</div>
 				<div class="description">
 					<div class="title">描述：</div>
-					<textarea class="content" type="text" :value="description" placeholder="输入内容限100字..." @input="changeReportDescription($event.target.value)"></textarea>
+					<textarea class="content" type="text" :value="report.description" placeholder="输入内容限100字..." @input="changeReportDescription($event.target.value)"></textarea>
 				</div>
 			</div>
 			<div class="footer">
 				<span class="createdTime secondary">{{report.distanceNow}}</span>
 				<span>
-					<c-button color="default">取消</c-button>
+					<c-button color="default" @click="cancelReportFetch">取消</c-button>
 					<c-button color="primary" @click="enterReportFetch(report)">确认</c-button>
 				</span>
 			</div>
@@ -45,13 +45,13 @@ import { mapActions, mapState } from 'vuex'
 export default {
 	name: 'a-report-editor',
 	computed: {
-		...mapState(['report']),
+		...mapState(['report', 'reportTypes']),
 		...mapState({
 			reportEditorVisible: state => state.status.reportEditorVisible
 		})
 	},
 	methods: {
-		...mapActions(['toggleReportEditorVisible', 'changeReportType', 'changeReportDescription', 'enterReportFetch'])
+		...mapActions(['cancelReportFetch', 'changeReportType', 'changeReportDescription', 'enterReportFetch'])
 	}
 }
 </script>
@@ -125,6 +125,7 @@ export default {
 						flex: 1;
 						text-align: center;
 						margin: 0 $spacing;
+						cursor: pointer;
 
 						&.selected {
 							border-radius: 2.5px;

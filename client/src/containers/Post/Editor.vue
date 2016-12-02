@@ -2,7 +2,7 @@
 	<div>
 		<c-button class="float-btn new-post" icon="edit" @click="togglePostEditorVisible"></c-button>
 		<div class="editor" v-show="postEditorVisible">
-			<div class="editor-bg" @click="togglePostEditorVisible"></div>
+			<div class="editor-bg" @click="cancelPostFetch"></div>
 			<div class="editor-main">
 				<div class="header">
 					<span class="username">{{logined ? userinfo.username : '佚名'}}</span>
@@ -34,7 +34,7 @@ export default {
 		})
 	},
 	methods: {
-		...mapActions(['changePostText', 'enterPostFetch', 'togglePostEditorVisible'])
+		...mapActions(['changePostText', 'enterPostFetch', 'cancelPostFetch', 'togglePostEditorVisible'])
 	}
 }
 </script>
