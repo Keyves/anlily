@@ -3,7 +3,7 @@ module.exports = function requireRole(role) {
 		var user = ctx.session.user
 
         if (user && user.role === role)
-            next();
+            await next()
         else
             ctx.status = 403
     }

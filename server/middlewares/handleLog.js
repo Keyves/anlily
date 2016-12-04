@@ -23,6 +23,6 @@ module.exports = function(log) {
 					query: ctx.query
 				})
 		}
-		next()
+		await next()
 	}
 }

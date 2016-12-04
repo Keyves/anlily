@@ -47,7 +47,7 @@ if (process.env.NODE_ENV !== 'test') {
 	app.on('error', logger.error.bind(logger))
 } else {
 	app.use(async (ctx, next) => {
-		console.log(ctx.headers, 'user: ',ctx.session.user)
+		console.log(ctx.headers.cookie, ctx.url, ctx.method, ctx.session.user && ctx.session.user.email)
 		await next()
 	})
 	app.on('error', () => {})

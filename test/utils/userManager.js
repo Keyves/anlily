@@ -7,14 +7,20 @@ module.exports =  {
 	},
 
 	async registerAndLogin(role) {
-		const { request, userinfo, primaryKey } = this
-		const res = await request.post(api.register).send(userinfo)
-		if (role === 'admin') {
-			const user = this.UserModel.findOne({primaryKey})
-			user.role = 1123
-			await user.save()
+		const { request, userinfo, primaryKey, UserModel } = this
+		let res
+
+		try {
+			res = await request.post(api.register).send(userinfo)
+			if (role === 'admin') {
+				await UserModel.findOneAndUpdate({[primaryKey]: userinfo[primaryKey]}, {role: 1123})
+				// 更新session缓存的user
+				res = await request.post(api.login).send(userinfo)
+			}
+			return res.headers['set-cookie']
+		} catch(e) {
+			console.log('userManager: 用户创建失败', primaryKey, userinfo[primaryKey])
 		}
-		return res.headers['set-cookie']
 	},
 
 	async removeAndLogout() {

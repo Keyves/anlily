@@ -12,7 +12,7 @@ router
 .post('/', async (ctx) => {
 	const user = ctx.session.user
 	const post = refine(ctx.request.body, ['text', 'category', 'images', 'tags'])
-console.log('router:', user.userid)
+
 	if (user) {
 		post.username = user.username
 		post.userid = user._id

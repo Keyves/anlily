@@ -17,10 +17,10 @@ describe('post', function() {
 	}
 	const request = supertest.agent(app.listen())
 	const userinfo = {
-		email: 'temp@gmail.com',
-		password: 'pass123456'
+		email: 'username@gmail.com',
+		password: 'password123456'
 	}
-	userManager.init({request, userinfo, UserModel, primaryKey: 'email'})
+	userManager.init({request, userinfo, primaryKey: 'email', UserModel})
 
 	const invalidCategory = '不合法类别'
 	const validCategory = '综合版1'
@@ -103,18 +103,18 @@ describe('post', function() {
 		})
 	})
 
-	describe.only('post, login', async () => {
+	describe('post, login', async () => {
+		let cookies
 		before(async () => {
-			await userManager.registerAndLogin()
+			cookies = await userManager.registerAndLogin()
 		})
 
 		after(async () => {
 			await userManager.removeAndLogout()
 		})
-		
-		it('success, have username, userid', async () => {
 
-			const res = await request.post(api.post).send(post)
+		it('success, have username, userid', async () => {
+			const res = await request.post(api.post).set('cookie', cookies.join(';')).withCredentials().send(post)
 			expect(res.status).to.equal(200)
 			const _post = res.body.data
 			expect(_post).to.contain.all.keys(['_id', 'createdTime', 'username', 'userid'])
@@ -123,34 +123,36 @@ describe('post', function() {
 		})
 	})
 
-	describe('delete', async () => {
-		it('success', async () => {
-			await userManager.registerAndLogin('admin')
-
-			let res
-			res = await request.post(api.post).send(post)
-			const postid = res.body.data._id
-			res = await request.del([api.post, postid].join('/'))
-			expect(res.status).to.equal(200)
-			res = await request.get(api.post).query({category: post.category})
-			expect(res.status).to.equal(404)
-
+	describe.only('delete', async () => {
+		afterEach(async () => {
 			await userManager.removeAndLogout()
 		})
 
-		it('fail, no permission', async () => {
+		it('success', async () => {
+			const cookies = await userManager.registerAndLogin('admin')
+
 			let res
-			await userManager.registerAndLogin()
-			res = await request.post(api.post).send(post)
+			res = await request.post(api.post).set('cookie', cookies.join(';')).send(post)
 			const postid = res.body.data._id
-			res = await request.del([api.post, postid].join('/'))
+			res = await request.del(api.post).query({postid}).set('cookie', cookies.join(';'))
+			expect(res.status).to.equal(200)
+			res = await request.get(api.post).query({category: post.category})
+			expect(res.status).to.equal(404)
+		})
+
+		it('fail, no permission', async () => {
+			const cookies = await userManager.registerAndLogin()
+
+			let res
+			res = await request.post(api.post).set('cookie', cookies.join(';')).send(post)
+			const postid = res.body.data._id
+			res = await request.del(api.post).query({postid}).set('cookie', cookies.join(';'))
 			expect(res.status).to.equal(403)
 			res = await request.get(api.post).query({category: post.category})
 			const _post = res.body.data[0]
 			expect(res.status).to.equal(200)
 			expect(_post).to.contain.all.keys(post)
 
-			await userManager.removeAndLogout()
 			await removePost(_post)
 		})
 	})

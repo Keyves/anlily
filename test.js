@@ -104,12 +104,12 @@ function dfsDiff(oldNode, newNode, index, patchMap) {
 }
 
 function diffChildren(oldChildren, newChildren, index, patches) {
-	var leftNode, oldChild, newChild, currentNodeIndex = index
+	var leftNode, oldChild, newChild
 	for (var i = 0; i < oldChildren.length;  i++) {
 		oldChild = oldChildren[i]
 		newChild = newChildren[i]
-		currentNodeIndex = (leftNode && leftNode.count) ? currentNodeIndex + leftNode.count + 1 : currentNodeIndex + 1
-		dfsDiff(oldChild, newChild, currentNodeIndex, patches)
+		index = (leftNode && leftNode.count) ? index + leftNode.count + 1 : index + 1
+		dfsDiff(oldChild, newChild, index, patches)
 		leftNode = oldChild
 	}
 }
