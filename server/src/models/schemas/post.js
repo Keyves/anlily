@@ -9,7 +9,10 @@ const postSchema = new Schema({
 		type: Number,
 		ref: 'User'
 	},
-	username: String,
+	username: {
+		type: String,
+		ref: 'User'
+	},
 	ip: String,
 	text: String,
 	images: [String],

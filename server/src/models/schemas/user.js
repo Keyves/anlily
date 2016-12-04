@@ -2,7 +2,6 @@ const mongoose = require('mongoose')
 const commentSchema = require('./comment')
 const autoIncrement = require('mongoose-auto-increment')
 const Schema = mongoose.Schema
-const ObjectId = Schema.Types.ObjectId
 
 const userSchema = new Schema({
 	username: {

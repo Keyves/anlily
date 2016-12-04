@@ -12,9 +12,9 @@ router
 .post('/', async (ctx) => {
 	const user = ctx.session.user
 	const post = refine(ctx.request.body, ['text', 'category', 'images', 'tags'])
-
+console.log('router:', user.userid)
 	if (user) {
-		post.username = user.name
+		post.username = user.username
 		post.userid = user._id
 	} else {
 		post.username = '佚名'
@@ -22,12 +22,12 @@ router
 	post.ip = ctx.ip
 
 	const fullPost = await postDriver.insert(post)
-	ctx.body = refine(fullPost, ['createdTime', '_id'])
+	ctx.body = refine(fullPost, ['createdTime', '_id', 'username', 'userid'])
 })
 .del('/', requireRole(1123), async (ctx) => {
 	const postid = ctx.query.postid
 	await postDriver.removeByPostid(postid)
-	ctx.status = 204
+	ctx.status = 200
 })
 .post('/:postid/comment', async (ctx) => {
 	const user = ctx.session.user
@@ -45,7 +45,7 @@ router
 
 	const fullComment = await postDriver.insertComment(postid, comment)
 
-	ctx.body = refine(fullComment, ['createdTime', 'reply', '_id'])
+	ctx.body = refine(fullComment, ['createdTime', '_id', 'username', 'userid'])
 })
 .del('/:postid/comment', async (ctx) => {
 	const user = ctx.session.user
@@ -54,7 +54,7 @@ router
 		const postid = ctx.params.postid
 		const commentid = ctx.query.commentid
 		await postDriver.removeCommentByPostidAndCommentid(postid, commentid)
-		ctx.status = 204
+		ctx.status = 200
 	} else {
 		throw new Error('权限不足')
 	}

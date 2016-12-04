@@ -1,14 +1,15 @@
 const PostModel = require('../models/post')
 const userDriver = require('./user')
+const NotFoundError = require('../errors/NotFoundError')
 
 const postDriver = {
 	async findOneByPostid(postid) {
 		try {
 			const post = await PostModel.findOne({_id: postid})
-			if (!post) {
-				throw new Error('该文章不存在')
-			} else {
+			if (post) {
 				return post
+			} else {
+				throw new NotFoundError('该文章不存在')
 			}
 		} catch(e) {
 			e.message = `find post failed - ${e.message}`
@@ -19,10 +20,10 @@ const postDriver = {
 	async findByUserName(username) {
 		try {
 			const posts = await PostModel.find({username})
-			if (!posts) {
-				throw new Error('用户尚未创建文章')
-			} else {
+			if (posts && posts.length > 0) {
 				return posts
+			} else {
+				throw new NotFoundError('用户尚未创建文章')
 			}
 		} catch(e) {
 			e.message = `find posts failed - ${e.message}`
@@ -33,10 +34,10 @@ const postDriver = {
 	async findByCategory(category) {
 		try {
 			const posts = await PostModel.find({category})
-			if (!posts) {
-				throw new Error('该分类下尚未创建文章')
-			} else {
+			if (posts && posts.length > 0) {
 				return posts
+			} else {
+				throw new NotFoundError('该分类下尚未创建文章')
 			}
 		} catch(e) {
 			e.message = `find posts failed - ${e.message}`
@@ -83,7 +84,7 @@ const postDriver = {
 
 				return _comment
 			} else {
-				throw new Error('被评论的文章不存在')
+				throw new NotFoundError('被评论的文章不存在')
 			}
 		} catch(e) {
 			e.message = `insert comment failed - ${e.message}`
@@ -107,7 +108,7 @@ const postDriver = {
 				post.comments.pull({_id: commentid})
 				await post.save()
 			} else {
-				throw new Error('不存在该文章')
+				throw new NotFoundError('不存在该文章')
 			}
 		} catch(e) {
 			e.message = `remove comment failed - ${e.message}`

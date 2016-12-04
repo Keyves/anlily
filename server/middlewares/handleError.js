@@ -1,4 +1,4 @@
-const { AuthorizeError } = require('../src/errors')
+const { AuthorizeError, NotFoundError } = require('../src/errors')
 
 
 module.exports = function handleError() {
@@ -18,6 +18,7 @@ module.exports = function handleError() {
 				case TypeError:				// 类型错误
 					ctx.status = 400
 					break
+				case NotFoundError:
 				case URIError:				// 地址错误
 					ctx.status = 404
 					break

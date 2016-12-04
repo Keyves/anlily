@@ -1,7 +1,7 @@
 const supertest = require('supertest')
 const api = require('./utils/api')
 const clone = require('./utils/clone')
-const getCookies = require('./utils/getCookies')
+const userManager = require('./utils/userManager')
 const app = require('../server/app')
 const UserModel = require('../server/src/models/user')
 
@@ -9,29 +9,30 @@ process.env.NODE_ENV = 'test'
 
 describe('user', () => {
 	const request = supertest.agent(app.listen())
-	const data = {
+	const userinfo = {
 		email: 'username@gmail.com',
 		password: 'password123456'
 	}
+	userManager.init({request, userinfo, primaryKey: 'email', UserModel})
 
 	describe('register', async () => {
 		after(async () => {
-			await UserModel.remove({email: data.email})
+			await UserModel.remove({email: userinfo.email})
 		})
 
 		it('success', async () => {
-			await request.post(api.register).send(data).expect(200)
+			await request.post(api.register).send(userinfo).expect(200)
 		})
 
 		it('fail, account has existed', async () => {
-			await request.post(api.register).send(data).expect(401)
+			await request.post(api.register).send(userinfo).expect(401)
 		})
 
 		it('fail, email is invaild', async () => {
 			let handleData, email, errorSamples = ['what', 'csahvnlii.com', '123123/@a.com']
 
 			for (email of errorSamples) {
-				handleData = clone(data, {email})
+				handleData = clone(userinfo, {email})
 				await request.post(api.register).send(handleData).expect(401)
 			}
 		})
@@ -40,7 +41,7 @@ describe('user', () => {
 			let handleData, password, errorSamples = ['1231', 'snvdio', '.dvsa', '123.']
 
 			for (password of errorSamples) {
-				handleData = clone(data, {password})
+				handleData = clone(userinfo, {password})
 				await request.post(api.register).send(handleData).expect(401)
 			}
 		})
@@ -48,22 +49,22 @@ describe('user', () => {
 
 	describe('login post', async () => {
 		before(async () => {
-			await request.post(api.register).send(data)
+			await request.post(api.register).send(userinfo)
 		})
 
 		after(async () => {
-			await UserModel.remove({email: data.email})
+			await UserModel.remove({email: userinfo.email})
 		})
 
 		it('success', async () => {
-			await request.post(api.login).send(data).expect(200)
+			await request.post(api.login).send(userinfo).expect(200)
 		})
 
 		it('fail, email is invaild', async () => {
 			let handleData, email, errorSamples = ['what', 'csahvnlii.com', '123123/@a.com']
 
 			for (email of errorSamples) {
-				handleData = clone(data, {email})
+				handleData = clone(userinfo, {email})
 				await request.post(api.login).send(handleData).expect(401)
 			}
 		})
@@ -72,7 +73,7 @@ describe('user', () => {
 			let handleData, password, errorSamples = ['1231', 'snvdio', '.dvsa', '123.']
 
 			for (password of errorSamples) {
-				handleData = clone(data, {password})
+				handleData = clone(userinfo, {password})
 				await request.post(api.login).send(handleData).expect(401)
 			}
 		})
@@ -80,12 +81,11 @@ describe('user', () => {
 
 	describe('login get', async () => {
 		before(async () => {
-			await getCookies(request, data)
+			await userManager.registerAndLogin()
 		})
 
 		after(async () => {
-			await UserModel.remove({email: data.email})
-			await request.get(api.logout)
+			await userManager.removeAndLogout()
 		})
 
 		it('success, with cookie', async () => {
@@ -101,11 +101,11 @@ describe('user', () => {
 
 	describe('logout get', async () => {
 		before(async () => {
-			await getCookies(request, data)
+			await userManager.registerAndLogin()
 		})
 
 		after(async () => {
-			await UserModel.remove({email: data.email})
+			await userManager.removeAndLogout()
 		})
 
 		it('success, with cookie', async () => {

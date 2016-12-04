@@ -1,5 +1,8 @@
 module.exports = {
-	register: '/u/register',
+	user: '/u',
+	post: '/post',
+	report: '/report',
 	login: '/u/login',
-	logout: '/u/logout'
+	logout: '/u/logout',
+	register: '/u/register'
 }

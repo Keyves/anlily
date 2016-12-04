@@ -5,23 +5,23 @@ module.exports = function(log) {
 			case 'POST':
 			case 'PUT':
 			case 'PATCH':
-				log(
-					'ip: ', ctx.ip,
-					'|url: ', ctx.url,
-					'|method: ', method,
-					'|body: ', ctx.request.body
-				)
+				log({
+					ip: ctx.ip,
+					url: ctx.url,
+					method: method,
+					body: ctx.request.body
+				})
 				break
 			case 'GET':
 			case 'DELETE':
 			default:
-				log(
-					'ip: ', ctx.ip,
-					'|url: ', ctx.url,
-					'|method: ', method,
-					'|params: ', ctx.params,
-					'|query: ', ctx.query
-				)
+				log({
+					ip: ctx.ip,
+					url: ctx.url,
+					method: method,
+					params: ctx.params,
+					query: ctx.query
+				})
 		}
 		next()
 	}
