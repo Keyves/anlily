@@ -1,39 +1,31 @@
 const mongoose = require('mongoose')
 const commentSchema = require('./comment')
 const autoIncrement = require('mongoose-auto-increment')
+const { roles } = require('../../../conf')
 const Schema = mongoose.Schema
+
 
 const userSchema = new Schema({
 	username: {
 		unique: true,
-		type: String
+		type: String,
+		required: true
 	},
 	email: {
 		unique: true,
 		type: String
 	},
 	password: String,
-	avator: String,
-	followers: [{
-		type: Number,
-		ref: 'User'
-	}],
-	following: [{
-		type: Number,
-		ref: 'User'
-	}],
 	createdTime: {
 		type: Date,
 		default: Date.now
 	},
-	// 0: nomal user
-	// 1: verified user
-	// 2: professonal user
-	// >10: admin
+	// 0: anonymous user
+	// 1: register user
 	// 1123: super admin
 	role: {
 		type: Number,
-		default: 0
+		default: roles.ANONYMOUS
 	},
 	comments: [commentSchema]
 })

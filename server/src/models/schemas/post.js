@@ -17,7 +17,7 @@ const postSchema = new Schema({
 	text: String,
 	images: [String],
 	category: String,
-	tags: [String],
+	locked: Boolean,
 	createdTime: {
 		type: Date,
 		default: Date.now

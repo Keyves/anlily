@@ -3,13 +3,20 @@ const userDriver = require('../drivers/user')
 const refine = require('../utils/refine')
 const validateUser = require('../validators/user')
 
-const returnKeys = ['username', 'comments', 'createdTime', 'email', 'role', 'followers', 'following']
+const returnKeys = ['username', 'comments', 'createdTime', 'email', 'role']
 
 router
+.post('/anonymous', async (ctx) => {
+	const user = await userDriver.register()
+	ctx.session.user = user
+	ctx.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 90
+	ctx.body = refine(user, returnKeys)
+})
 .post('/register', async (ctx) => {
 	const userinfo = refine(ctx.request.body, ['email', 'password'])
 
 	validateUser(userinfo)
+	userinfo.role = 1
 
 	const user = await userDriver.register(userinfo)
 	ctx.session.user = user

@@ -3,21 +3,11 @@
 		<a-navigator></a-navigator>
 		<div class="container-content">
 			<a-sidebar class="content-sidebar"></a-sidebar>
-			<a-waterfall :column="2"></a-waterfall>
+			<a-post-waterfall :column="2"></a-post-waterfall>
 		</div>
 		<a-post-editor></a-post-editor>
 		<c-notification></c-notification>
 		<a-authorize></a-authorize>
-		<!-- <a-report
-			:suspectid="100012"
-			:reporterid="1000111"
-			:postid="10001"
-			type="广告"
-			description="内容包含了广告"
-			text="what the fuck"
-			:createdTime="new Date().toString()"
-			>
-		</a-report> -->
 		<a-report-editor></a-report-editor>
 	</div>
 </template>
@@ -25,20 +15,19 @@
 <script lang="babel">
 import SideBar from './SideBar'
 import Navigator from './Navigator'
-import { Editor as PostEditor } from './Post'
-import Report, { Editor as ReportEditor } from './Report'
-import Waterfall from './Waterfall'
+import { Editor as PostEditor, Waterfall as PostWaterfall } from './Post'
+import { Editor as ReportEditor, Waterfall as ReportWaterfall } from './Report'
 import Authorize from './Authorize'
 
 export default {
 	components: {
 		'a-sidebar': SideBar,
 		'a-navigator': Navigator,
-		'a-waterfall': Waterfall,
 		'a-authorize': Authorize,
-		'a-report': Report,
 		'a-post-editor': PostEditor,
-		'a-report-editor': ReportEditor
+		'a-post-waterfall': PostWaterfall,
+		'a-report-editor': ReportEditor,
+		'a-report-waterfall': ReportWaterfall
 	}
 }
 </script>

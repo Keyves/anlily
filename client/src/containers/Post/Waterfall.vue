@@ -1,9 +1,9 @@
 <template>
-	<div class="a-waterfall" ref="waterfall">
+	<div class="a-post-waterfall" ref="waterfall">
 		<div class="col" v-for="posts in cols">
 			<a-post
 				class="post"
-				v-for="post in posts"
+				v-for="post in items"
 				:admin="admin"
 				:id="post._id"
 				:username="post.username"
@@ -66,56 +66,35 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import { throttle } from 'src/utils'
+import Waterfall from 'src/containers/mixins/Waterfall'
 import DateLib from 'src/lib/DateLib'
 import Post from './Post'
 const Comment = Post.Comment
 
 export default {
-	name: 'a-waterfall',
-	props: {
-		columnWidth: {
-			type: Number,
-			default: 500
-		}
-	},
-	data() {
-		return {
-			column: 1,
-			handler: null,
-			restCommentVisible: false
-		}
-	},
+	name: 'a-post-waterfall',
 	computed: {
-		...mapState(['posts', 'comment']),
+		...mapState(['comment', 'posts']),
 		...mapState({
-			role: state => state.userinfo.role
+			role: state => state.userinfo.role,
 		}),
 		admin() {
 			return this.role === 1123
 		},
-		cols() {
-			let posts, post, comments, cols = [], columnNumber, i, j
-			posts = this.posts
-			columnNumber = this.column
-
-			// 初始化文章列
-			for (i = 0; i < columnNumber; i++)
-				cols[i] = []
-
-			// 分发文章到各个列中, 并给文章和评论设置索引index
+		items() {
+			let i, j, post, comments, posts = this.posts
 			for (i = 0; i < posts.length; i++) {
 				post = posts[i]
 				post.index = i
 				comments = post.comments
-				for (j = 0; j < comments.length; j++) {
+				for (j = 0; i < comments.length; j++) {
 					comments[j].index = j
 				}
-				cols[i % columnNumber].push(post)
 			}
-
-			return cols
+			return posts
 		}
 	},
+	mixins: [Waterfall],
 	methods: {
 		...mapActions(['enterCommentFetch', 'changeCommentText', 'getPostsFetch', 'deletePostFetch', 'deleteCommentFetch', 'readyReport']),
 		getTopTwoComments(arr) {
@@ -140,26 +119,6 @@ export default {
 	created() {
 		this.getPostsFetch('综合版1')
 	},
-	mounted() {
-		const waterfall = this.$refs.waterfall
-		const columnWidth = this.columnWidth
-		let column
-
-		// 节流，触发间隔至少为100ms
-		const handler = throttle(() => {
-			// 在当前瀑布流的宽度下容纳最大整数列数
-			column = Math.floor(waterfall.offsetWidth / columnWidth)
-			if (column !== this.column && column > 0) {
-				this.column = column
-			}
-		}, 100)
-
-		window.addEventListener('resize', handler, false)
-		this.handler = handler
-	},
-	destroyed() {
-		window.removeEventListener('resize', this.handler, false)
-	},
 	components: {
 		'a-post': Post,
 		'a-comment': Comment
@@ -169,7 +128,7 @@ export default {
 <style lang="scss">
 @import "~src/variables";
 
-.a-waterfall {
+.a-post-waterfall {
 	overflow: hidden;
 	display: flex;
 	min-width: 500px;

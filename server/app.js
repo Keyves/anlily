@@ -8,6 +8,7 @@ const cors = require('koa-cors')
 const mongoose = require('mongoose')
 const autoIncrement = require('mongoose-auto-increment')
 const bunyan = require('bunyan')
+const { AuthorizeError } = require('./src/errors')
 
 console.error = console.debug = function() {
 	console.log.apply(console, ['\n\x1b[31m', ...Array.prototype.slice.apply(arguments).map(v => v && typeof v === 'object' ? JSON.parse(JSON.stringify(v)) : v), '\x1b[0m\n'])
@@ -46,13 +47,22 @@ if (process.env.NODE_ENV !== 'test') {
 	app.use(handleLog(logger.info.bind(logger)))
 	app.on('error', logger.error.bind(logger))
 } else {
-	app.use(async (ctx, next) => {
-		console.log(ctx.headers.cookie, ctx.url, ctx.method, ctx.session.user && ctx.session.user.email)
-		await next()
-	})
 	app.on('error', () => {})
 }
 
+function allowedUrls(urls) {
+	return urls.indexOf(this.url) > -1
+}
+
+app.use(async (ctx, next) => {
+	const user = ctx.session.user
+console.log(ctx.method, ctx.url, ctx.cookie, user && user.email)
+	if (allowedUrls.call(ctx, ['/u/register', '/u/login', '/u/anonymous']) || user) {
+		await next()
+	} else {
+		throw new AuthorizeError('未登录')
+	}
+})
 app.use(handleError())
 app.use(router.routes(), router.allowedMethods())
 // response

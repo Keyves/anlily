@@ -4,24 +4,42 @@ const clone = require('./utils/clone')
 const userManager = require('./utils/userManager')
 const app = require('../server/app')
 const UserModel = require('../server/src/models/user')
+const roles = require('./utils/roles')
 
 process.env.NODE_ENV = 'test'
 
 describe('user', () => {
+	async function removeUser() {
+		for (let user of arguments) {
+			await UserModel.remove({_id: user._id})
+		}
+	}
 	const request = supertest.agent(app.listen())
 	const userinfo = {
 		email: 'username@gmail.com',
 		password: 'password123456'
 	}
+	const returnKeys = ['username', 'comments', 'createdTime', 'email', 'role']
 	userManager.init({request, userinfo, primaryKey: 'email', UserModel})
 
-	describe('register', async () => {
-		after(async () => {
-			await UserModel.remove({email: userinfo.email})
-		})
-
+	describe('anonymous', async () => {
 		it('success', async () => {
-			await request.post(api.register).send(userinfo).expect(200)
+			const res = await request.post(api.anonymous).send().expect(200)
+			const user = res.body.data
+			expect(user).to.contain.any.keys(returnKeys)
+
+			await removeUser(user)
+		})
+	})
+
+	describe('register', async () => {
+		it('success', async () => {
+			const res = await request.post(api.register).send(userinfo).expect(200)
+			const user = res.body.data
+			expect(user).to.contain.any.keys(returnKeys)
+			expect(user.email).to.equal(userinfo.email)
+
+			await removeUser(user)
 		})
 
 		it('fail, account has existed', async () => {
@@ -52,12 +70,12 @@ describe('user', () => {
 			await request.post(api.register).send(userinfo)
 		})
 
-		after(async () => {
-			await UserModel.remove({email: userinfo.email})
-		})
-
 		it('success', async () => {
-			await request.post(api.login).send(userinfo).expect(200)
+			const res = await request.post(api.login).send(userinfo).expect(200)
+			const user = res.body.data
+			expect(user).to.contain.any.keys(returnKeys)
+
+			await removeUser(user)
 		})
 
 		it('fail, email is invaild', async () => {
@@ -79,9 +97,9 @@ describe('user', () => {
 		})
 	})
 
-	describe('login get', async () => {
+	describe('register, login get', async () => {
 		before(async () => {
-			await userManager.registerAndLogin()
+			await userManager.registerAndLogin(roles.REGISTER)
 		})
 
 		after(async () => {
@@ -99,9 +117,9 @@ describe('user', () => {
 	})
 
 
-	describe('logout get', async () => {
+	describe('register, logout get', async () => {
 		before(async () => {
-			await userManager.registerAndLogin()
+			await userManager.registerAndLogin(roles.REGISTER)
 		})
 
 		after(async () => {

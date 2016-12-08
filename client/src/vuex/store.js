@@ -23,7 +23,6 @@ const initialUser = {
 
 const initialReport = {
 	suspectid: -1,
-	reporterid: -1,
 	postid: -1,
 	// ['色情', '辱骂', '广告', '其它']
 	type: '',
@@ -42,6 +41,7 @@ const initialState = {
 		logined: false
 	},
 	posts: [],
+	reports: [],
 	post: clone(initialPost),
 	comment: clone(initialComment),
 	report: clone(initialReport),
@@ -135,13 +135,6 @@ const reportMutations = {
 		state.report = clone(initialReport)
 	}
 }
-
-console.log({
-	...userMutations,
-	...statusMutations,
-	...postMutations,
-	...reportMutations
-})
 
 export default {
 	state: initialState,

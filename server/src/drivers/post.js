@@ -47,9 +47,7 @@ const postDriver = {
 
 	async insert(post) {
 		try {
-			const _post = await new PostModel(post)
-			await _post.save()
-			return _post
+			return await new PostModel(post).save()
 		} catch(e) {
 			e.message = `insert post failed - ${e.message}`
 			throw e

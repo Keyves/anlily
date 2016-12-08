@@ -2,6 +2,7 @@ const router = require('koa-router')()
 const postDriver = require('../drivers/post')
 const refine = require('../utils/refine')
 const requireRole = require('../utils/requireRole')
+const { roles } = require('../../conf')
 
 router
 .get('/', async (ctx) => {
@@ -24,7 +25,7 @@ router
 	const fullPost = await postDriver.insert(post)
 	ctx.body = refine(fullPost, ['createdTime', '_id', 'username', 'userid'])
 })
-.del('/', requireRole(1123), async (ctx) => {
+.del('/', requireRole(roles.SUPER_ADMIN), async (ctx) => {
 	const postid = ctx.query.postid
 	await postDriver.removeByPostid(postid)
 	ctx.status = 200
@@ -34,30 +35,17 @@ router
 	const postid = ctx.params.postid
 	const comment = refine(ctx.request.body, ['text', 'images', 'tags'])
 
-	if (user) {
-		comment.username = user.username
-		comment.userid = user._id
-		comment.role = 1
-	} else {
-		comment.username = '佚名'
-	}
+	comment.username = user.username
+	comment.userid = user._id
 	comment.ip = ctx.ip
-
 	const fullComment = await postDriver.insertComment(postid, comment)
-
 	ctx.body = refine(fullComment, ['createdTime', '_id', 'username', 'userid'])
 })
-.del('/:postid/comment', async (ctx) => {
-	const user = ctx.session.user
-
-	if (user && user.role === 1123) {
-		const postid = ctx.params.postid
-		const commentid = ctx.query.commentid
-		await postDriver.removeCommentByPostidAndCommentid(postid, commentid)
-		ctx.status = 200
-	} else {
-		throw new Error('权限不足')
-	}
+.del('/:postid/comment', requireRole(roles.SUPER_ADMIN), async (ctx) => {
+	const postid = ctx.params.postid
+	const commentid = ctx.query.commentid
+	await postDriver.removeCommentByPostidAndCommentid(postid, commentid)
+	ctx.status = 200
 })
 
 module.exports = router

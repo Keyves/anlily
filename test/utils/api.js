@@ -4,5 +4,6 @@ module.exports = {
 	report: '/report',
 	login: '/u/login',
 	logout: '/u/logout',
-	register: '/u/register'
+	register: '/u/register',
+	anonymous: '/u/anonymous'
 }

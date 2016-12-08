@@ -6,6 +6,7 @@ const app = require('../server/app')
 const PostModel = require('../server/src/models/post')
 const UserModel = require('../server/src/models/user')
 const { expect } = require('chai')
+const roles = require('./utils/roles')
 
 process.env.NODE_ENV = 'test'
 
@@ -106,7 +107,7 @@ describe('post', function() {
 	describe('post, login', async () => {
 		let cookies
 		before(async () => {
-			cookies = await userManager.registerAndLogin()
+			cookies = await userManager.registerAndLogin(roles.REGISTER)
 		})
 
 		after(async () => {
@@ -129,7 +130,7 @@ describe('post', function() {
 		})
 
 		it('success', async () => {
-			const cookies = await userManager.registerAndLogin('admin')
+			const cookies = await userManager.registerAndLogin(roles.SUPER_ADMIN)
 
 			let res
 			res = await request.post(api.post).set('cookie', cookies.join(';')).send(post)
@@ -141,7 +142,7 @@ describe('post', function() {
 		})
 
 		it('fail, no permission', async () => {
-			const cookies = await userManager.registerAndLogin()
+			const cookies = await userManager.registerAndLogin(roles.REGISTER)
 
 			let res
 			res = await request.post(api.post).set('cookie', cookies.join(';')).send(post)
@@ -155,5 +156,27 @@ describe('post', function() {
 
 			await removePost(_post)
 		})
+	})
+})
+
+describe('comment', async () => {
+	describe('post, not login', async () => {
+		it('success, have _id auto increment and generate timestamp, username', async () => {
+
+		})
+
+		it('fail, lack of text', async () => {
+
+		})
+	})
+
+	describe('post, login', async () => {
+		it('success, have _id auto increment and generate timestamp, username, userid', async () => {
+
+		})
+	})
+
+	describe('delete, not login', async () => {
+
 	})
 })

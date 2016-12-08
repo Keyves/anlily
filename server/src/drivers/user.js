@@ -24,22 +24,24 @@ const userDriver = {
 	 */
 	async register(userinfo) {
 		try {
-			const { email, password } = userinfo
+			if (userinfo) {
+				const { email, password } = userinfo
 
-			const _user = await UserModel.findOne({email})
+				const _user = await UserModel.findOne({email})
 
-			if (_user) {
-				throw new AuthorizeError('用户已存在')
+				if (_user) {
+					throw new AuthorizeError('用户已存在')
+				} else {
+					const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
+					const hash = await bcrypt.hash(password, salt)
+					userinfo.password = hash
+				}
 			} else {
-				const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
-				const hash = await bcrypt.hash(password, salt)
-				userinfo.password = hash
-				userinfo.username = await getUniqueUsername()
-
-				const user = new UserModel(userinfo)
-				await user.save()
-				return user
+				userinfo = {}
 			}
+			userinfo.username = await getUniqueUsername()
+
+			return new UserModel(userinfo).save()
 		} catch(e) {
 			e.message = `insert post fail - ${e.message}`
 			throw e

@@ -6,5 +6,6 @@ export default {
 	report: `${HOST}/report`,
 	login: `${HOST}/u/login`,
 	logout: `${HOST}/u/logout`,
-	register: `${HOST}/u/register`
+	register: `${HOST}/u/register`,
+	anonymous: `${HOST}/u/anonymous`
 }
