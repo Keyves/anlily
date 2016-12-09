@@ -9,7 +9,7 @@
 			{{category}}
 		</c-menu-item>
 	</c-menu>
-	<c-button class="a-sidebar-item" @click="getReportsFetch">值班室</c-button>
+	<c-button class="a-sidebar-item" @click="changeCategoryAndGetReportsFetch('值班室')">值班室</c-button>
 	<c-button class="a-sidebar-item">布告栏</c-button>
 </div>
 </template>
@@ -38,7 +38,7 @@ export default {
 		})
 	},
 	methods: {
-		...mapActions(['changeCategoryAndGetPosts', 'getReportsFetch'])
+		...mapActions(['changeCategoryAndGetPosts', 'changeCategoryAndGetReportsFetch'])
 	}
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
 	<div class="a-report-editor" v-show="reportEditorVisible">
-		<div class="a-report-editor-bg" @click="cancelReportFetch"></div>
+		<div class="a-report-editor-bg" @click="cancelReadyReport"></div>
 		<div class="a-report-editor-main">
 			<div class="header">
 				<div class="postid">
@@ -31,7 +31,7 @@
 			<div class="footer">
 				<span class="createdTime secondary">{{report.distanceNow}}</span>
 				<span>
-					<c-button color="default" @click="cancelReportFetch">取消</c-button>
+					<c-button color="default" @click="cancelReadyReport">取消</c-button>
 					<c-button color="primary" @click="enterReportFetch(report)">确认</c-button>
 				</span>
 			</div>
@@ -51,7 +51,7 @@ export default {
 		})
 	},
 	methods: {
-		...mapActions(['cancelReportFetch', 'changeReportType', 'changeReportDescription', 'enterReportFetch'])
+		...mapActions(['cancelReadyReport', 'changeReportType', 'changeReportDescription', 'enterReportFetch'])
 	}
 }
 </script>

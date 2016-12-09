@@ -19,7 +19,7 @@ export const getLoginedUser = async ({commit}) => {
 
 export const logout = async ({commit}) => {
 	try {
-		await fetchAPI(api.logout, 'get')
+		await fetchAPI(api.logout, 'delete')
 
 		commit(types.LOGOUT_SUCCESS)
 		notice('登出成功')
@@ -33,13 +33,24 @@ export const toggleAuthorizeVisible = ({commit}) => {
 	commit(types.TOGGLE_AUTHORIZE_VISIBLE)
 }
 
-export const changeCategoryAndGetPosts = async ({commit}, category) => {
+export const changeCategoryAndGetPosts = async ({commit, dispatch}, category) => {
 	try {
-		await getPostsFetch({commit}, category)
+		await dispatch('getPostsFetch', category)
 
 		commit(types.CHANGE_CATEGORY, category)
 	} catch(e) {
 		notice('更改失败，原因：' + e.message)
+		throw e
+	}
+}
+
+export const changeCategoryAndGetReportsFetch = async ({commit, dispatch}, category) => {
+	try {
+		await dispatch('getReportsFetch')
+
+		commit(types.CHANGE_CATEGORY, category)
+	} catch(e) {
+		notice('更换失败，原因：' + e.message)
 		throw e
 	}
 }
@@ -97,7 +108,7 @@ export const login = async ({commit}, userinfo) => {
 // report
 export const getReportsFetch = async ({commit}) => {
 	try {
-		const reports = fetchAPI(api.report, 'get')
+		const reports = await fetchAPI(api.report, 'get')
 		commit(types.GET_REPORTS_FETCH_SUCCESS, reports)
 	} catch(e) {
 		notice('获取举报函失败：' + e.message)
@@ -105,9 +116,14 @@ export const getReportsFetch = async ({commit}) => {
 	}
 }
 
-export const readyReport = ({commit}, [suspectid, postid, text]) => {
-	commit(types.READY_REPORT, [suspectid, postid, text])
+export const readyReport = ({commit}, {suspectid, postid, commentid, text}) => {
+	commit(types.READY_REPORT, {suspectid, postid, commentid, text})
 	commit(types.TOGGLE_REPORT_EDITOR_VISIBLE)
+}
+
+export const cancelReadyReport = async ({commit, dispatch}) => {
+	commit(types.INIT_REPORT)
+	dispatch('toggleReportEditorVisible')
 }
 
 export const changeReportType = ({commit}, value) => {
@@ -132,11 +148,25 @@ export const enterReportFetch = async ({commit}, report) => {
 	}
 }
 
-export const cancelReportFetch = async ({commit, dispatch}) => {
-	commit(types.INIT_REPORT)
-	dispatch('toggleReportEditorVisible')
+export const invokeReportFetch = async ({commit}, reportid) => {
+	try {
+		await fetchAPI([api.report, 'invoke'].join('/'), 'delete', {reportid})
+		commit(types.INVOKE_REPORT_FETCH_SUCCESS, reportid)
+		notice('处理成功')
+	} catch(e) {
+		notice('处理失败，原因：' + e.message)
+	}
 }
 
+export const revokeReportFetch = async ({commit}, reportid) => {
+	try {
+		await fetchAPI(api.report, 'delete', {reportid})
+		commit(types.REVOKE_REPORT_FETCH_SUCCESS, reportid)
+		notice('撤销成功')
+	} catch(e) {
+		notice('撤销失败，原因：' + e.message)
+	}
+}
 
 
 // post
@@ -155,7 +185,7 @@ export const changePostText = ({commit}, value) => {
 	commit(types.CHANGE_POST_CONTENT, value)
 }
 
-export const enterPostFetch = async ({commit, dispatch}, [category, post]) => {
+export const enterPostFetch = async ({commit, dispatch}, {category, post}) => {
 	post.category = category
 
 	try {
@@ -176,11 +206,11 @@ export const cancelPostFetch = async ({commit, dispatch}) => {
 	dispatch('togglePostEditorVisible')
 }
 
-export const deletePostFetch = async ({commit}, [postid, postIndex]) => {
+export const deletePostFetch = async ({commit}, postid) => {
 	try {
 		await fetchAPI(api.post, 'delete', {postid})
 
-		commit(types.DELETE_POST_FETCH_SUCCESS, postIndex)
+		commit(types.DELETE_POST_FETCH_SUCCESS, postid)
 		notice('删除文章成功')
 	} catch(e) {
 		notice('删除文章失败，原因：' + e.message)
@@ -192,12 +222,12 @@ export const changeCommentText = ({commit}, value) => {
 	commit(types.CHANGE_COMMENT_TEXT, value)
 }
 
-export const enterCommentFetch = async ({commit}, [postid, comment, postIndex]) => {
+export const enterCommentFetch = async ({commit}, {postid, comment}) => {
 	try {
 		const data = await fetchAPI([api.post, postid, 'comment'].join('/'), 'post', comment)
 		Object.assign(comment, data)
 
-		commit(types.ENTER_COMMENT_FETCH_SUCCESS, [comment, postIndex])
+		commit(types.ENTER_COMMENT_FETCH_SUCCESS, {postid, comment})
 		notice('评论成功')
 	} catch(e) {
 		notice('评论失败，原因：' + e.message)
@@ -205,11 +235,11 @@ export const enterCommentFetch = async ({commit}, [postid, comment, postIndex]) 
 	}
 }
 
-export const deleteCommentFetch = async ({commit}, [postid, postIndex, commentid, commentIndex]) => {
+export const deleteCommentFetch = async ({commit}, {postid, commentid}) => {
 	try {
 		await fetchAPI([api.post, postid, 'comment'].join('/'), 'delete', {commentid})
 
-		commit(types.DELETE_COMMENT_FETCH_SUCCESS, [postIndex, commentIndex])
+		commit(types.DELETE_COMMENT_FETCH_SUCCESS, {postid, commentid})
 		notice('删除评论成功')
 	} catch(e) {
 		notice('删除评论失败，原因：' + e.message)

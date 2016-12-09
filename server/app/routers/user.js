@@ -41,6 +41,7 @@ router
 	}
 })
 .del('/logout', async (ctx) => {
+	console.debug('begin what')
 	ctx.session = null
 	ctx.status = 200
 })

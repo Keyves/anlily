@@ -2,8 +2,7 @@ const router = require('koa-router')()
 const refine = require('../utils/refine')
 const requireRole = require('../utils/requireRole')
 const reportDriver = require('../drivers/report')
-const roles = require('../../conf')
-
+const { roles } = require('../../conf')
 
 router
 .get('/', async (ctx) => {
@@ -11,7 +10,7 @@ router
 	ctx.body = reports
 })
 .post('/', async (ctx) => {
-	const report = refine(ctx.request.body, ['suspectid', 'postid', 'type', 'description'])
+	const report = refine(ctx.request.body, ['suspectid', 'postid', 'commentid', 'type', 'description', 'text'])
 	const user = ctx.session.user
 
 	report.reporterid = user._id
@@ -24,7 +23,7 @@ router
 	await reportDriver.removeByReportid(reportid)
 	ctx.status = 200
 })
-.del('/handle', requireRole(roles.SUPER_ADMIN), async (ctx) => {
+.del('/invoke', requireRole(roles.SUPER_ADMIN), async (ctx) => {
 	const reportid = ctx.query.reportid
 	await reportDriver.updatePostByReportid(reportid)
 	ctx.status = 200

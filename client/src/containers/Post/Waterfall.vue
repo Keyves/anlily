@@ -10,12 +10,12 @@
 				:agent="post.agent"
 				:created-time="post.createdTime"
 				:text="post.text"
-				@report="readyReport([post.userid, post._id, post.text])"
+				@report="readyReport({userid: comment.userid, postid: post._id, text: post.text})"
 				@review="changeCommentText($event.target.value)"
-				@send="enterCommentFetch([post._id, comment, post.index])"
-				@remove="deletePostFetch([post._id, post.index])"
+				@send="enterCommentFetch({postid: post._id, comment})"
+				@remove="deletePostFetch(post._id)"
 				>
-				<a-comment
+				<a-post-comment
 					v-for="comment in getTopTwoComments(post.comments)"
 					:id="comment._id"
 					:reply="comment.reply"
@@ -23,9 +23,10 @@
 					:agent="comment.agent"
 					:created-time="comment.createdTime"
 					:text="comment.text"
-					@remove="deleteCommentFetch([post._id, post.index, comment._id, comment.index])"
+					@report="readyReport({suspectid: comment.userid, postid: post._id, commentid: comment._id, text: post.text})"
+					@remove="deleteCommentFetch({postid: post._id, commentid: comment._id})"
 					>
-				</a-comment>
+				</a-post-comment>
 				<div v-if="getRestCommentsNumber(post.comments)">
 					<div
 						class="btn toggle-rest-comment"
@@ -34,7 +35,7 @@
 						>
 						{{getRestCommentsNumber(post.comments) + '条评论已隐藏'}}
 					</div>
-					<a-comment
+					<a-post-comment
 						v-show="restCommentVisible"
 						v-for="comment in getRestComments(post.comments)"
 						:id="comment._id"
@@ -43,11 +44,12 @@
 						:agent="comment.agent"
 						:created-time="comment.createdTime"
 						:text="comment.text"
-						@remove="deleteCommentFetch([post._id, post.index, comment._id, comment.index])"
+						@report="readyReport({suspectid: comment.userid, postid: post._id, commentid: comment._id, text: post.text})"
+						@remove="deleteCommentFetch({postid: post._id, commentid: comment._id})"
 						>
-					</a-comment>
+					</a-post-comment>
 				</div>
-				<a-comment
+				<a-post-comment
 					v-for="comment in getLastTwoComments(post.comments)"
 					:id="comment._id"
 					:reply="comment.reply"
@@ -55,9 +57,10 @@
 					:agent="comment.agent"
 					:created-time="comment.createdTime"
 					:text="comment.text"
-					@remove="deleteCommentFetch([post._id, post.index, comment._id, comment.index])"
+					@report="readyReport({suspectid: comment.userid, postid: post._id, commentid: comment._id, text: post.text})"
+					@remove="deleteCommentFetch({postid: post._id, commentid: comment._id})"
 					>
-				</a-comment>
+				</a-post-comment>
 			</a-post>
 		</div>
 	</div>
@@ -69,7 +72,7 @@ import { throttle } from 'src/utils'
 import Waterfall from 'src/containers/mixins/Waterfall'
 import DateLib from 'src/lib/DateLib'
 import Post from './Post'
-const Comment = Post.Comment
+import Comment from './Comment'
 
 export default {
 	name: 'a-post-waterfall',
@@ -82,16 +85,7 @@ export default {
 			return this.role === 1123
 		},
 		items() {
-			let i, j, post, comments, posts = this.posts
-			for (i = 0; i < posts.length; i++) {
-				post = posts[i]
-				post.index = i
-				comments = post.comments
-				for (j = 0; i < comments.length; j++) {
-					comments[j].index = j
-				}
-			}
-			return posts
+			return this.posts
 		}
 	},
 	mixins: [Waterfall],
@@ -121,7 +115,7 @@ export default {
 	},
 	components: {
 		'a-post': Post,
-		'a-comment': Comment
+		'a-post-comment': Comment
 	}
 }
 </script>

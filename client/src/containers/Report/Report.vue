@@ -26,9 +26,9 @@
 		</div>
 		<div class="footer">
 			<span class="report-createdTime secondary">{{distanceNow}}</span>
-			<span>
-				<c-button color="default">撤销</c-button>
-				<c-button color="primary">处理</c-button>
+			<span v-if="admin">
+				<c-button color="default" @click="this.onRevoke">撤销</c-button>
+				<c-button color="primary" @click="this.onInvoke">处理</c-button>
 			</span>
 		</div>
 	</div>
@@ -40,6 +40,7 @@ import DateLib from 'src/lib/DateLib'
 export default {
 	name: 'a-report',
 	props: {
+		admin: Boolean,
 		suspectid: Number,
 		reporterid: Number,
 		postid: Number,
@@ -53,6 +54,14 @@ export default {
 		distanceNow() {
 			return DateLib.getDistanceNow(new Date(this.createdTime))
 		}
+	},
+	methods: {
+		onRevoke(e) {
+			this.$emit('revoke', e)
+		},
+		onInvoke(e) {
+			this.$emit('invoke', e)
+		}
 	}
 }
 </script>
@@ -61,12 +70,8 @@ export default {
 @import "~src/variables";
 
 .report {
-	position: fixed;
-	left: 50%;
-	top: 50%;
-	transform: translateX(-50%) translateY(-50%);
-	width: 600px;
 	background-color: white;
+	margin: $spacing $spacing / 2;
 	box-shadow: 0 0 5px $shadow-color;
 
 	.title {

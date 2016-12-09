@@ -24,6 +24,7 @@ const initialUser = {
 const initialReport = {
 	suspectid: -1,
 	postid: -1,
+	commentid: -1,
 	// ['色情', '辱骂', '广告', '其它']
 	type: '',
 	description: '',
@@ -99,18 +100,20 @@ const postMutations = {
 		state.posts.push(clone(post))
 		state.post = clone(initialPost)
 	},
-	[types.DELETE_POST_FETCH_SUCCESS] (state, postIndex) {
-		state.posts.splice(postIndex, 1)
+	[types.DELETE_POST_FETCH_SUCCESS] (state, postid) {
+		state.posts = state.posts.filter(v => v._id !== postid)
 	},
 	[types.CHANGE_COMMENT_TEXT] (state, value) {
 		state.comment.text = value
 	},
-	[types.ENTER_COMMENT_FETCH_SUCCESS] (state, [comment, postIndex]) {
-		state.posts[postIndex].comments.push(clone(comment))
+	[types.ENTER_COMMENT_FETCH_SUCCESS] (state, {postid, comment}) {
+		const post = state.posts.find(v => v._id === postid)
+		post && post.comments.push(clone(comment))
 		state.comment = clone(initialComment)
 	},
-	[types.DELETE_COMMENT_FETCH_SUCCESS] (state, [postIndex, commentIndex]) {
-		state.posts[postIndex].comments.splice(commentIndex, 1)
+	[types.DELETE_COMMENT_FETCH_SUCCESS] (state, {postid, commentid}) {
+		const post = state.posts.find(v => v._id === postid)
+		post && (post.comments = post.comments.filter(v => v._id !== commentid))
 	}
 }
 
@@ -121,8 +124,8 @@ const reportMutations = {
 	[types.GET_REPORTS_FETCH_SUCCESS] (state, reports) {
 		state.reports = reports
 	},
-	[types.READY_REPORT] (state, [suspectid, postid, text]) {
-		state.report = clone(state.report, {suspectid, postid, text, type: state.reportTypes[0]})
+	[types.READY_REPORT] (state, {suspectid, postid, text, commentid}) {
+		state.report = clone(state.report, {suspectid, postid, commentid, text, type: state.reportTypes[0]})
 	},
 	[types.CHANGE_REPORT_TYPE] (state, type) {
 		state.report.type = type
@@ -133,6 +136,12 @@ const reportMutations = {
 	[types.ENTER_REPORT_FETCH_SUCCESS] (state, report) {
 		state.reports.push(clone(report))
 		state.report = clone(initialReport)
+	},
+	[types.INVOKE_REPORT_FETCH_SUCCESS] (state, reportid) {
+		state.reports = state.reports.filter(v => v._id !== reportid)
+	},
+	[types.REVOKE_REPORT_FETCH_SUCCESS] (state, reportid) {
+		state.reports = state.reports.filter(v => v._id !== reportid)
 	}
 }
 

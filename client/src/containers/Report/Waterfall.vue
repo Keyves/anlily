@@ -4,6 +4,7 @@
 			<a-report
 				class="report"
 				v-for="report in items"
+				:admin="admin"
 				:suspectid="report.suspectid"
 				:reporterid="report.reporterid"
 				:postid="report.postid"
@@ -11,6 +12,8 @@
 				:description="report.description"
 				:text="report.text"
 				:createdTime="report.createdTime"
+				@revoke="revokeReportFetch(report._id)"
+				@invoke="invokeReportFetch(report._id)"
 				>
 			</a-report>
 		</div>
@@ -40,9 +43,11 @@ export default {
 		}
 	},
 	mixins: [Waterfall],
+	methods: {
+		...mapActions(['revokeReportFetch', 'invokeReportFetch'])
+	},
 	components: {
-		'a-report': Report,
-		'a-comment': Comment
+		'a-report': Report
 	}
 }
 </script>

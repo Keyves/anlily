@@ -4,7 +4,8 @@
 			<span class="id secondary">{{'#' + id}}</span>
 			<span class="username">{{username}}</span>
 			<span class="created-time secondary">{{distanceNow}}</span>
-			<c-button class="btn delete" icon-color="error" icon="delete" @click="remove"></c-button>
+			<c-button color="default" icon="error_outline" @click.stop="onReport"></c-button>
+			<c-button class="btn delete" icon-color="error" icon="delete" @click="onRemove"></c-button>
 		</div>
 		<div class="section">
 			<div class="text">{{text}}</div>
@@ -16,7 +17,7 @@
 import DateLib from 'src/lib/DateLib'
 
 export default {
-	name: 'a-comment',
+	name: 'a-post-comment',
 	props: {
 		id: Number,
 		username: String,
@@ -29,8 +30,11 @@ export default {
 		}
 	},
 	methods: {
-		remove(e) {
+		onRemove(e) {
 			this.$emit('remove', e)
+		},
+		onReport(e) {
+			this.$emit('report', e)
 		}
 	}
 }
@@ -43,7 +47,7 @@ $small-spacing: 5px;
 
 .comment {
 	padding: $small-spacing $spacing;
-	border: 1px dashed #f5f5f5;//#eaeaea;
+	border: 1px dashed #f5f5f5;
 	box-sizing: border-box;
 
 	&:hover {

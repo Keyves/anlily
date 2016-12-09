@@ -15,6 +15,10 @@ const reportSchema = new Schema({
 		type: Number,
 		ref: 'Post'
 	},
+	commentid: {
+		type: Number,
+		ref: 'Comment'
+	},
 	// ['色情', '辱骂', '广告', '其它']
 	type: String,
 	description: String,

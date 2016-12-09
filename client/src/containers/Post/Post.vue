@@ -6,7 +6,7 @@
 			<span class="created-time secondary">{{distanceNow}}</span>
 			<span class="comment-number secondary">{{commentNumber}}</span>
 			<c-button color="default" icon="more_vert"></c-button>
-			<c-button color="default" icon="error_outline" @click.stop="handleReport"></c-button>
+			<c-button color="default" icon="error_outline" @click.stop="onReport"></c-button>
 		</div>
 		<div class="section" @click="changeExpandStatus">
 			<!-- <div>{{text}}</div> -->
@@ -17,7 +17,7 @@
 				<c-button icon="reply"></c-button>
 			</div>
 			<div class="right">
-				<c-button icon-color="error" icon="delete" v-if="admin" @click="handleRemove"></c-button>
+				<c-button icon-color="error" icon="delete" v-if="admin" @click="onRemove"></c-button>
 				<c-button icon="message" @click="toggleInputboxVisible"></c-button>
 				<c-button icon="details"></c-button>
 			</div>
@@ -28,11 +28,11 @@
 			</div>
 			<div class="inputbox" v-show="inputboxVisible">
 				<div class="content">
-					<textarea class="section atwho" type="text" :value="value" @input="handleReview" placeholder="输入内容限100字"></textarea>
+					<textarea class="section atwho" type="text" :value="value" @input="onReview" placeholder="输入内容限100字"></textarea>
 				</div>
 				<div class="btn-group">
 					<c-button icon="photo"></c-button>
-					<c-button color="info" @click="handleSend">发送</c-button>
+					<c-button color="info" @click="onSend">发送</c-button>
 				</div>
 			</div>
 		</div>
@@ -96,18 +96,18 @@ export default {
 			this.inputboxVisible = false
 			this.expandStatus = !this.expandStatus
 		},
-		handleReview(e) {
+		onReview(e) {
 			this.value = e.target.value
 			this.$emit('review', e)
 		},
-		handleSend(e) {
+		onSend(e) {
 			this.value = ''
 			this.$emit('send', e)
 		},
-		handleRemove(e) {
+		onRemove(e) {
 			this.$emit('remove', e)
 		},
-		handleReport(e) {
+		onReport(e) {
 			this.$emit('report', e)
 		}
 	},

@@ -12,7 +12,7 @@
 				<div class="footer">
 					<div class="btn-group">
 						<c-button icon="photo"></c-button>
-						<c-button color="info" @click="enterPostFetch([category, post])">发送</c-button>
+						<c-button color="info" @click="enterPostFetch({category, post})">发送</c-button>
 					</div>
 				</div>
 			</div>

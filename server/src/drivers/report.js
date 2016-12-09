@@ -4,7 +4,7 @@ const postDriver = require('./post')
 const reportDriver = {
 	async findOneByReportid(reportid) {
 		try {
-			const report = await ReportModel.findOne({reportid})
+			const report = await ReportModel.findOne({_id: reportid})
 			if (report) {
 				return report
 			} else {
@@ -52,7 +52,15 @@ const reportDriver = {
 		try {
 			const report = await reportDriver.findOneByReportid(reportid)
 			const post = await postDriver.findOneByPostid(report.postid)
-			post.text = `因违反社区关于[${report.type}]的规定，内容被删除`
+
+			const text = `因包含[${report.type}]内容违反社区相关规定，故删除`
+
+			if (report.commentid) {
+				const comment = post.comments.id(report.commentid)
+				comment && (comment.text = text)
+			} else {
+				post.text = text
+			}
 			await post.save()
 		} catch(e) {
 			e.message = `update post by report failed - ${e.message}`

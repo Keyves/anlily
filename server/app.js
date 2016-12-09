@@ -6,6 +6,7 @@ const json = require('koa-json')
 const bodyparser = require('koa-bodyparser')()
 const cors = require('koa-cors')
 const mongoose = require('mongoose')
+const redisStore = require('koa-redis')
 const autoIncrement = require('mongoose-auto-increment')
 const bunyan = require('bunyan')
 const { AuthorizeError } = require('./src/errors')
@@ -13,8 +14,6 @@ const { AuthorizeError } = require('./src/errors')
 console.error = console.debug = function() {
 	console.log.apply(console, ['\n\x1b[31m', ...Array.prototype.slice.apply(arguments).map(v => v && typeof v === 'object' ? JSON.parse(JSON.stringify(v)) : v), '\x1b[0m\n'])
 }
-
-// console.info = (message) => console.log('\n\x1b[46m', message, '\x1b[0m\n')
 
 const NAME = 'anonymous'
 
@@ -24,14 +23,19 @@ mongoose.connect('127.0.0.1', NAME)
 mongoose.connection.on('error', (err) => console.log(err))
 autoIncrement.initialize(mongoose.connection)
 
+// 注册和维护管理员帐号
+const updateAdministrators = require('./src/utils/updateAdministrators')
+const conf = require('./conf')
+updateAdministrators(conf.admins, {role: conf.roles.SUPER_ADMIN})
+
+// middlewares
 const router = require('./src/routers')
 const handleError = require('./middlewares/handleError')
 const handleLog = require('./middlewares/handleLog')
 
-
-// middlewares
 app.keys = ['session-key']
 app.use(convert(session({
+	store: redisStore(),
     cookie: {
         maxage: 1000 * 60 * 60 * 24 * 7
     }
@@ -45,7 +49,7 @@ app.use(convert(cors({
 if (process.env.NODE_ENV !== 'test') {
 	const logger = bunyan.createLogger({name: NAME})
 	app.use(handleLog(logger.info.bind(logger)))
-	app.on('error', logger.error.bind(logger))
+	app.on('error', console.debug.bind(console))//logger.error.bind(logger))
 } else {
 	app.on('error', () => {})
 }
@@ -56,9 +60,10 @@ function allowedUrls(urls) {
 
 app.use(async (ctx, next) => {
 	const user = ctx.session.user
-console.log(ctx.method, ctx.url, ctx.cookie, user && user.email)
+console.log(ctx.method, ctx.url, user && user.email)
 	if (allowedUrls.call(ctx, ['/u/register', '/u/login', '/u/anonymous']) || user) {
 		await next()
+		console.log(ctx.status)
 	} else {
 		throw new AuthorizeError('未登录')
 	}
