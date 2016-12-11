@@ -30,6 +30,9 @@ export default async function fetchApi(url, method, data) {
 	}
 	if (res && res.status === 200) {
 		json = await res.json()
+		if (json.code) {
+			throw new Error(`${json.code} ${json.message}`)
+		}
 		return json.data
 	} else if (res && res.status < 400 && res.status > 200) {
 		return await res.text()

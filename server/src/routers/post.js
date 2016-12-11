@@ -1,7 +1,7 @@
 const router = require('koa-router')()
 const postDriver = require('../drivers/post')
 const refine = require('../utils/refine')
-const requireRole = require('../utils/requireRole')
+const { requireRole } = require('../utils')
 const { roles } = require('../../conf')
 
 router
@@ -14,12 +14,8 @@ router
 	const user = ctx.session.user
 	const post = refine(ctx.request.body, ['text', 'category', 'images', 'tags'])
 
-	if (user) {
-		post.username = user.username
-		post.userid = user._id
-	} else {
-		post.username = '佚名'
-	}
+	post.username = user.username
+	post.userid = user._id
 	post.ip = ctx.ip
 
 	const fullPost = await postDriver.insert(post)
@@ -38,6 +34,7 @@ router
 	comment.username = user.username
 	comment.userid = user._id
 	comment.ip = ctx.ip
+
 	const fullComment = await postDriver.insertComment(postid, comment)
 	ctx.body = refine(fullComment, ['createdTime', '_id', 'username', 'userid'])
 })

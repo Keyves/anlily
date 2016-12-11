@@ -35,7 +35,7 @@ const config = {
 	},
 	vue : {
 		loaders: {
-			scss: ExtractTextPlugin.extract('vue-style-loader', 'css!sass!postcss')//'vue-style-loader!css!sass'
+			scss: ExtractTextPlugin.extract('vue-style-loader', 'css!sass')//'vue-style-loader!css!sass'
 		}
 	},
 	module: {
@@ -48,7 +48,7 @@ const config = {
 			loader: 'vue'
 		}, {
 			test: /\.s?css$/,
-			loader: ExtractTextPlugin.extract('vue-style-loader', 'css!sass!postcss')//'vue-style-loader!css!sass'
+			loader: ExtractTextPlugin.extract('vue-style-loader', 'css!sass')//'vue-style-loader!css!sass'
 		}, {
 			test: /\.json$/,
 			loader: 'json'

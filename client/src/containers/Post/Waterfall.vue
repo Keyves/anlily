@@ -10,8 +10,9 @@
 				:agent="post.agent"
 				:created-time="post.createdTime"
 				:text="post.text"
+				:comments="post.comments"
 				@report="readyReport({userid: comment.userid, postid: post._id, text: post.text})"
-				@review="changeCommentText($event.target.value)"
+				@review="changeCommentText($event.target.innerHTML)"
 				@send="enterCommentFetch({postid: post._id, comment})"
 				@remove="deletePostFetch(post._id)"
 				>

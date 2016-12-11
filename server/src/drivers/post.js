@@ -2,6 +2,45 @@ const PostModel = require('../models/post')
 const userDriver = require('./user')
 const NotFoundError = require('../errors/NotFoundError')
 
+const usernameAtRE = /@([^\s]+)/g
+const commentidAtRE = /#(\d+)/g
+
+function atFormat(type, displayText, realText) {
+	return [type, '[', displayText, ':', realText, ']'].join('')
+}
+
+async function noticeUserAndReplaceText(text, message, comments) {
+	if (!message.postid)
+		throw new Error('用户消息来源未知')
+
+	message.type = 'at'
+
+	let _user, comment, result, username, commentid, uMap, cMap
+
+
+	while ((result = usernameAtRE.exec(text))) {
+		username = result[1]
+		_user = await userDriver.noticeByUsername(username, message)
+		uMap[username] = _user
+	}
+	text = text.replace(usernameAtRE, (str, username) => atFormat('@', username, uMap[username]))
+
+	if (comments) {
+		while ((result = commentidAtRE.exec(text))) {
+			commentid = result[1]
+			comment = comments.id(commentid)
+			if (comment) {
+				_user = await userDriver.noticeByUsername(comment.username, message)
+				cMap[commentid] = _user
+			}
+		}
+		text = text.replace(commentidAtRE, (str, commentid) => atFormat('#', commentid, cMap[commentid]))
+	}
+
+	return text
+}
+
+
 const postDriver = {
 	async findOneByPostid(postid) {
 		try {
@@ -47,7 +86,14 @@ const postDriver = {
 
 	async insert(post) {
 		try {
-			return await new PostModel(post).save()
+			const _post = await new PostModel(post).save()
+
+			const message = {
+				postid: _post._id,
+				from: _post.userid
+			}
+			await noticeUserAndReplaceText(post.text, message)
+			return _post
 		} catch(e) {
 			e.message = `insert post failed - ${e.message}`
 			throw e
@@ -64,19 +110,12 @@ const postDriver = {
 				comments.push(comment)
 				await _post.save()
 
-				// [#Number ]
-				const reg = /#(\d+)\s/
-				const result = reg.exec(comment.text)
-				if (result) {
-					const reply = result[1]
-					const username = comments[reply].username
-					const user = await userDriver.findOneByUsername(username)
-					if (user) {
-						user.comments.push(comment)
-						user.save()
-					}
+				const message = {
+					postid,
+					commentid: comment._id,
+					from: comment.userid
 				}
-
+				await noticeUserAndReplaceText(comment.text, message, comments)
 				// 获取由mongoose创建的comment详细信息，如createdTime等
 				const _comment = comments[comments.length - 1]
 

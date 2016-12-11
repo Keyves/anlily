@@ -34,6 +34,7 @@ module.exports = function handleError() {
 				code: ctx.status,
 				message: e.message || '服务器错误'
 			}
+			ctx.status = 200
 			ctx.app.emit('error', e.message, ctx)
 		}
 	}

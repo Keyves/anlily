@@ -1,8 +1,26 @@
 const mongoose = require('mongoose')
-const commentSchema = require('./comment')
 const autoIncrement = require('mongoose-auto-increment')
 
 const Schema = mongoose.Schema
+const Mixed = Schema.Types.Mixed
+
+const commentSchema = new Schema({
+	userid: {
+		type: Number,
+		ref: 'User'
+	},
+	_id: {
+		type: Number,
+		default: 1
+	},
+	username: String,
+	text: String,
+	tokens: [Mixed],
+	createdTime: {
+		type: Date,
+		default: Date.now
+	}
+})
 
 const postSchema = new Schema({
 	userid: {
@@ -15,7 +33,7 @@ const postSchema = new Schema({
 	},
 	ip: String,
 	text: String,
-	images: [String],
+	tokens: [Mixed],
 	category: String,
 	locked: Boolean,
 	createdTime: {

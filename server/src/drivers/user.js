@@ -43,7 +43,7 @@ const userDriver = {
 
 			return new UserModel(userinfo).save()
 		} catch(e) {
-			e.message = `insert post fail - ${e.message}`
+			e.message = `register failed - ${e.message}`
 			throw e
 		}
 	},
@@ -67,7 +67,18 @@ const userDriver = {
 				throw new AuthorizeError('用户不存在')
 			}
 		} catch (e) {
-			e.message = `login fail - ${e.message}`
+			e.message = `login failed - ${e.message}`
+			throw e
+		}
+	},
+
+	async noticeByUsername(username, message) {
+		try {
+			const _user = await userDriver.findOneByUsername(username)
+			_user.messages.push(message)
+			return await _user.save()
+		} catch(e) {
+			e.message = `notice failed - ${e.message}`
 			throw e
 		}
 	}

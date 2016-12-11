@@ -1,9 +1,30 @@
 const mongoose = require('mongoose')
-const commentSchema = require('./comment')
 const autoIncrement = require('mongoose-auto-increment')
 const { roles } = require('../../../conf')
 const Schema = mongoose.Schema
 
+const messageSchema = new Schema({
+	from: {
+		type: Number,
+		ref: 'User'
+	},
+	// reply
+	// favour
+	// collect
+	// at
+	type: {
+		type: String,
+		required: true
+	},
+	postid: {
+		type: Number,
+		ref: 'User'
+	},
+	commentid: {
+		type: Number,
+		ref: 'Comment'
+	}
+})
 
 const userSchema = new Schema({
 	username: {
@@ -27,7 +48,7 @@ const userSchema = new Schema({
 		type: Number,
 		default: roles.ANONYMOUS
 	},
-	comments: [commentSchema]
+	messages: [messageSchema]
 })
 
 

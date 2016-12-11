@@ -9,7 +9,6 @@
 			<c-button color="default" icon="error_outline" @click.stop="onReport"></c-button>
 		</div>
 		<div class="section" @click="changeExpandStatus">
-			<!-- <div>{{text}}</div> -->
 			<a-token v-for="token in tokens" :type="token.type" :value="token.value"></a-token>
 		</div>
 		<div class="toolbar">
@@ -28,7 +27,8 @@
 			</div>
 			<div class="inputbox" v-show="inputboxVisible">
 				<div class="content">
-					<textarea class="section atwho" type="text" :value="value" @input="onReview" placeholder="输入内容限100字"></textarea>
+					<!-- <div ref="atwho" class="section atwho" contenteditable v-html="editorValue"></div> -->
+					<textarea ref="atwho" class="section atwho" :value="editorValue">
 				</div>
 				<div class="btn-group">
 					<c-button icon="photo"></c-button>
@@ -45,19 +45,7 @@ import Token from './Token.js'
 import $ from 'jquery'
 import parseText from './parseText'
 
-const data = ['what', 'keyves', 'sha']
-/*
-[{
-	username: 'what',
-	userid: '10001'
-}, {
-	username: 'keyves',
-	userid: '10001'
-}, {
-	username: 'bluesky',
-	userid: '10001'
-}]
-*/
+var data = ["smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee"]
 
 export default {
 	name: 'a-post',
@@ -68,16 +56,16 @@ export default {
 		commentNumber: Number,
 		createdTime: String,
 		text: String,
+		comments: Array,
 		expand: {
 			type: Boolean,
 			default: true
 		}
 	},
 	data() {
-		console.log(parseText(this.text), this.text)
 		return {
 			tokens: parseText(this.text),
-			value: '',
+			editorValue: '',
 			expandStatus: this.expand,
 			inputboxVisible: false
 		}
@@ -97,11 +85,10 @@ export default {
 			this.expandStatus = !this.expandStatus
 		},
 		onReview(e) {
-			this.value = e.target.value
 			this.$emit('review', e)
 		},
 		onSend(e) {
-			this.value = ''
+			this.editorValue = ''
 			this.$emit('send', e)
 		},
 		onRemove(e) {
@@ -111,13 +98,24 @@ export default {
 			this.$emit('report', e)
 		}
 	},
-	created() {
-		$('.atwho').atwho({
-			at: '@',
-			displayTpl: '<li>${username}</li>',
-			insertTpl: '@[${username}:${userid}]',
-			data
-		})
+	mounted() {
+		const { comments } = this, { atwho } = this.$refs, commentidArr = [], usernameArr = []
+		let comment
+		for (comment of comments) {
+			commentidArr.push(comment._id)
+			usernameArr.push(comment.username)
+		}
+
+		$(atwho)
+			.on('DOMSubtreeModified', this.onReview)
+			.atwho({
+				at: '@',
+				data: usernameArr
+			})
+			.atwho({
+				at: '#',
+				data: commentidArr
+			})
 	},
 	components: {
 		'a-token': Token
@@ -125,7 +123,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import "~src/variables";
 
 .article {
@@ -192,23 +190,15 @@ export default {
 		& > .inputbox {
 			display: flex;
 			flex-direction: column;
-			position: relative;
 
 			& > .content {
-				position: relative;
-				height: $height-section;
-
 				& > .section {
-					position: absolute;
-					left: 0;
-					top: 0;
 					width: 100%;
-					font-size: 14px;
 					height: $height-section;
-					border: none;
+					padding: 10px;
+					font-size: 14px;
 					outline: none;
 					border: 1px solid #eee;
-					padding: 10px;
 	    			box-sizing: border-box;
 				}
 			}
@@ -222,6 +212,12 @@ export default {
 				box-sizing: border-box;
 			}
 		}
+	}
+}
+
+.atwho {
+	& > &-inserted {
+		color: $color-warning;
 	}
 }
 </style>
