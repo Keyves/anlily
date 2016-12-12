@@ -2,44 +2,6 @@ const PostModel = require('../models/post')
 const userDriver = require('./user')
 const NotFoundError = require('../errors/NotFoundError')
 
-const usernameAtRE = /@([^\s]+)/g
-const commentidAtRE = /#(\d+)/g
-
-function atFormat(type, displayText, realText) {
-	return [type, '[', displayText, ':', realText, ']'].join('')
-}
-
-async function noticeUserAndReplaceText(text, message, comments) {
-	if (!message.postid)
-		throw new Error('用户消息来源未知')
-
-	message.type = 'at'
-
-	let _user, comment, result, username, commentid, uMap, cMap
-
-
-	while ((result = usernameAtRE.exec(text))) {
-		username = result[1]
-		_user = await userDriver.noticeByUsername(username, message)
-		uMap[username] = _user
-	}
-	text = text.replace(usernameAtRE, (str, username) => atFormat('@', username, uMap[username]))
-
-	if (comments) {
-		while ((result = commentidAtRE.exec(text))) {
-			commentid = result[1]
-			comment = comments.id(commentid)
-			if (comment) {
-				_user = await userDriver.noticeByUsername(comment.username, message)
-				cMap[commentid] = _user
-			}
-		}
-		text = text.replace(commentidAtRE, (str, commentid) => atFormat('#', commentid, cMap[commentid]))
-	}
-
-	return text
-}
-
 
 const postDriver = {
 	async findOneByPostid(postid) {
@@ -92,8 +54,8 @@ const postDriver = {
 				postid: _post._id,
 				from: _post.userid
 			}
-			await noticeUserAndReplaceText(post.text, message)
-			return _post
+			_post.text = await noticeUserAndReplaceText(post.text, message, _post.username)
+			return await _post.save()
 		} catch(e) {
 			e.message = `insert post failed - ${e.message}`
 			throw e
@@ -105,17 +67,19 @@ const postDriver = {
 			const _post = await PostModel.findOne({_id: postid})
 			if (_post) {
 				const comments = _post.comments
-				// 获取列表最后一位元素的索引并加1
-				comment._id = comments.length > 0 ? comments[comments.length - 1]._id + 1 : 1
-				comments.push(comment)
-				await _post.save()
 
 				const message = {
 					postid,
 					commentid: comment._id,
 					from: comment.userid
 				}
-				await noticeUserAndReplaceText(comment.text, message, comments)
+				comment.text = await noticeUserAndReplaceText(comment.text, message, comment.username, comments)
+
+				// 获取列表最后一位元素的索引并加1
+				comment._id = comments.length > 0 ? comments[comments.length - 1]._id + 1 : 1
+				comments.push(comment)
+				await _post.save()
+
 				// 获取由mongoose创建的comment详细信息，如createdTime等
 				const _comment = comments[comments.length - 1]
 
@@ -153,5 +117,62 @@ const postDriver = {
 		}
 	}
 }
+
+
+const usernameAtRE = /@([^\s]+)/g
+const commentidAtRE = /#(\d+)/g
+
+function atFormat(type, displayText, realText) {
+	return [type, '[', displayText, ':', realText, ']'].join('')
+}
+
+async function noticeUserAndReplaceText(text, message, ownname, comments) {
+	if (!message.postid)
+		throw new Error('用户消息来源未知')
+
+	message.type = 'at'
+
+	let _user, comment, result, username, userid, commentid, uMap = {}, cMap = {}
+
+	// 用每一个符合 @ 格式的username匹配userid，并存入Map对象中
+	while ((result = usernameAtRE.exec(text))) {
+		try {
+			username = result[1]
+			// 忽略 @ 自己的情况
+			if (username !== ownname) {
+				_user = await userDriver.noticeByUsername(username, message)
+				uMap[username] = _user._id
+			}
+		} catch(e) {
+			console.log(e)
+		}
+	}
+
+	// 若Map对象中存在对应的username，则按标准格式替换，否则原文
+	text = text.replace(usernameAtRE, (str, username) => (userid = uMap[username]) ? atFormat('@', username, userid) : str)
+
+	// 根据楼层号定位用户，获取userid，最后完成替换
+	if (comments) {
+		while ((result = commentidAtRE.exec(text))) {
+			try {
+				commentid = result[1]
+				comment = comments.id(commentid)
+				if (comment) {
+					username = comment.username
+					if (username !== ownname) {
+						_user = await userDriver.noticeByUsername(username, message)
+						cMap[commentid] = _user._id
+					}
+				}
+			} catch(e) {
+				console.log(e)
+			}
+		}
+		text = text.replace(commentidAtRE, (str, commentid) => (userid = cMap[commentid]) ? atFormat('#', commentid, userid) : str)
+	}
+
+	return text
+}
+
 
 module.exports = postDriver

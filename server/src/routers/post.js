@@ -12,7 +12,7 @@ router
 })
 .post('/', async (ctx) => {
 	const user = ctx.session.user
-	const post = refine(ctx.request.body, ['text', 'category', 'images', 'tags'])
+	const post = refine(ctx.request.body, ['text', 'category', 'images'])
 
 	post.username = user.username
 	post.userid = user._id
@@ -29,7 +29,7 @@ router
 .post('/:postid/comment', async (ctx) => {
 	const user = ctx.session.user
 	const postid = ctx.params.postid
-	const comment = refine(ctx.request.body, ['text', 'images', 'tags'])
+	const comment = refine(ctx.request.body, ['text', 'images'])
 
 	comment.username = user.username
 	comment.userid = user._id

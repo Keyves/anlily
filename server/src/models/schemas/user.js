@@ -41,6 +41,10 @@ const userSchema = new Schema({
 		type: Date,
 		default: Date.now
 	},
+	locked: {
+		type: Boolean,
+		default: false
+	},
 	// 0: anonymous user
 	// 1: register user
 	// 1123: super admin
@@ -55,7 +59,7 @@ const userSchema = new Schema({
 userSchema.plugin(autoIncrement.plugin, {
 	model: 'user',
 	field: '_id',
-	startAt: 10000
+	startAt: 100000
 })
 
 module.exports = userSchema

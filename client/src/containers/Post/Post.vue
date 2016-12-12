@@ -85,6 +85,7 @@ export default {
 			this.expandStatus = !this.expandStatus
 		},
 		onReview(e) {
+			console.log(e.target.value)
 			this.$emit('review', e)
 		},
 		onSend(e) {
@@ -100,14 +101,16 @@ export default {
 	},
 	mounted() {
 		const { comments } = this, { atwho } = this.$refs, commentidArr = [], usernameArr = []
-		let comment
+		let comment, $atwho = $(atwho)
 		for (comment of comments) {
 			commentidArr.push(comment._id)
 			usernameArr.push(comment.username)
 		}
 
-		$(atwho)
-			.on('DOMSubtreeModified', this.onReview)
+
+		$atwho
+			.on('input', this.onReview)
+			.on('inserted.atwho', $atwho.trigger.bind($atwho, 'input'))
 			.atwho({
 				at: '@',
 				data: usernameArr

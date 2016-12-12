@@ -42,7 +42,7 @@ router
 		ctx.status = 404
 	}
 })
-.get('/logout', async (ctx) => {
+.del('/logout', async (ctx) => {
 	ctx.session = null
 	ctx.status = 200
 })

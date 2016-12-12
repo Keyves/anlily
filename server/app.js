@@ -60,10 +60,14 @@ function allowedUrls(urls) {
 
 app.use(async (ctx, next) => {
 	const user = ctx.session.user
-console.log(ctx.method, ctx.url, user && user.email)
-	if (allowedUrls.call(ctx, ['/u/register', '/u/login', '/u/anonymous']) || user) {
+// console.log(ctx.method, ctx.url, user && user.email)
+	if (allowedUrls.call(ctx, ['/u/register', '/u/login', '/u/anonymous'])) {
 		await next()
-		console.log(ctx.status)
+	} else if (user) {
+		if (user.locked) {
+			throw new AuthorizeError('帐号被锁定，故无法登录')
+		}
+		await next()
 	} else {
 		throw new AuthorizeError('未登录')
 	}

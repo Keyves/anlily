@@ -16,6 +16,12 @@ async function getUniqueUsername() {
 	}
 }
 
+async function getBcryptPassword(password) {
+	const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
+	const hash = await bcrypt.hash(password, salt)
+	return hash
+}
+
 
 const userDriver = {
 	/**
@@ -32,9 +38,7 @@ const userDriver = {
 				if (_user) {
 					throw new AuthorizeError('用户已存在')
 				} else {
-					const salt = await bcrypt.genSalt(SALT_WORK_FACTOR)
-					const hash = await bcrypt.hash(password, salt)
-					userinfo.password = hash
+					userinfo.password = await getBcryptPassword(password)
 				}
 			} else {
 				userinfo = {}
@@ -64,7 +68,7 @@ const userDriver = {
 					return _user
 				}
 			} else {
-				throw new AuthorizeError('用户不存在')
+				throw new AuthorizeError('用户不存在', email)
 			}
 		} catch (e) {
 			e.message = `login failed - ${e.message}`
@@ -72,11 +76,31 @@ const userDriver = {
 		}
 	},
 
+	async updatePasswordByUserid(userid, password) {
+		try {
+			const _user = await UserModel.findOne({_id: userid})
+
+			if (_user) {
+				_user.password = await getBcryptPassword(password)
+				return await _user.save()
+			} else {
+				throw new AuthorizeError('用户不存在', userid)
+			}
+		} catch (e) {
+			e.message = `update failed - ${e.message}`
+			throw e
+		}
+	},
+
 	async noticeByUsername(username, message) {
 		try {
-			const _user = await userDriver.findOneByUsername(username)
-			_user.messages.push(message)
-			return await _user.save()
+			const _user = await UserModel.findOne({username})
+			if (_user) {
+				_user.messages.push(message)
+				return await _user.save()
+			} else {
+				throw new Error('该用户不存在', username)
+			}
 		} catch(e) {
 			e.message = `notice failed - ${e.message}`
 			throw e
