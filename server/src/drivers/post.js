@@ -74,7 +74,10 @@ const postDriver = {
 					from: comment.userid
 				}
 				comment.text = await noticeUserAndReplaceText(comment.text, message, comment.username, comments)
-
+				if (_post.userid !== comment.userid) {
+					message.type = 'reply'
+					await userDriver.noticeByUsername(comment.username, message)
+				}
 				// 获取列表最后一位元素的索引并加1
 				comment._id = comments.length > 0 ? comments[comments.length - 1]._id + 1 : 1
 				comments.push(comment)
