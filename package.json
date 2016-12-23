@@ -30,6 +30,7 @@
     "koa-session": "^3.3.1",
     "material-design-icons": "^3.0.1",
     "mongoose": "^4.5.10",
+    "tether-drop": "^1.4.2",
     "vue": "^2.0.3",
     "vue-waterfall": "^1.0.2",
     "vuex": "^2.0.0"

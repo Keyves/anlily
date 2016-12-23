@@ -5,11 +5,11 @@ import ColorfulUI from 'src/components'
 import store from './vuex'
 import 'material-design-icons'
 import './common.scss'
-import './filter'
 
 Vue.config.debug = true
 
 Vue.use(ColorfulUI)
+
 
 console.debug = function() {
 	var args = Array.prototype.slice.apply(arguments)

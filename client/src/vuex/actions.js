@@ -3,7 +3,7 @@ import api from 'src/conf/api'
 import { fetchAPI } from 'src/utils'
 import { Notification } from 'src/components'
 const notice = Notification.notice
-
+global.notice = notice
 // status
 export const getLoginedUser = async ({commit}) => {
 	try {
@@ -78,9 +78,9 @@ export const changeEmailText = ({commit}, value) => {
 	commit(types.CHANGE_EMAIL_TEXT, value)
 }
 
-export const register = async ({commit}, userinfo) => {
+export const register = async ({commit}, user) => {
 	try {
-		const user = await fetchAPI(api.register, 'post', userinfo)
+		const user = await fetchAPI(api.register, 'post', user)
 
 		commit(types.LOGIN_SUCCESS, user)
 		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
@@ -91,9 +91,9 @@ export const register = async ({commit}, userinfo) => {
 	}
 }
 
-export const login = async ({commit}, userinfo) => {
+export const login = async ({commit}, user) => {
 	try {
-		const user = await fetchAPI(api.login, 'post', userinfo)
+		const user = await fetchAPI(api.login, 'post', user)
 
 		commit(types.LOGIN_SUCCESS, user)
 		commit(types.TOGGLE_AUTHORIZE_VISIBLE)
@@ -181,6 +181,17 @@ export const getPostsFetch = async ({commit}, category) => {
 	}
 }
 
+export const getPostDetailFetch = async ({commit, dispatch}, postid) => {
+	try {
+		const post = await fetchAPI(api.post, 'get', {postid})
+
+		dispatch('changePostDetail', post)
+	} catch(e) {
+		notice('获取失败，原因：' + e.message)
+		throw e
+	}
+}
+
 export const changePostText = ({commit}, value) => {
 	commit(types.CHANGE_POST_CONTENT, value)
 }
@@ -245,4 +256,13 @@ export const deleteCommentFetch = async ({commit}, {postid, commentid}) => {
 		notice('删除评论失败，原因：' + e.message)
 		throw e
 	}
+}
+
+export const changePostDetail = async ({commit, dispatch}, post) => {
+	commit(types.CHANGE_POST_DETAIL, post)
+	dispatch('togglePostDetailVisible')
+}
+
+export const togglePostDetailVisible = ({commit}) => {
+	commit(types.TOGGLE_POST_DETAIL_VISIBLE)
 }

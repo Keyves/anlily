@@ -6,13 +6,20 @@ const { roles } = require('../../conf')
 
 router
 .get('/', async (ctx) => {
-	const category = ctx.query.category
-	const posts = await postDriver.findByCategory(category)
-	ctx.body = posts
+	const { category, postid } = ctx.query
+	if (category) {
+		const posts = await postDriver.findByCategory(category)
+		ctx.body = posts
+	} else if (postid) {
+		const post = await postDriver.findOneByPostid(postid)
+		ctx.body = post
+	} else {
+		ctx.status = 404
+	}
 })
 .post('/', async (ctx) => {
 	const user = ctx.session.user
-	const post = refine(ctx.request.body, ['text', 'category', 'images'])
+	const post = refine(ctx.request.body, ['text', 'category'])
 
 	post.username = user.username
 	post.userid = user._id

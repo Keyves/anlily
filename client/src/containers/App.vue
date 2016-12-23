@@ -6,6 +6,7 @@
 			<a-post-waterfall :column="2" v-show="!reportWaterfallVisible"></a-post-waterfall>
 			<a-report-waterfall :column="2" v-show="reportWaterfallVisible"></a-report-waterfall>
 		</div>
+		<a-post-detail></a-post-detail>
 		<a-post-editor></a-post-editor>
 		<c-notification></c-notification>
 		<a-authorize></a-authorize>
@@ -17,7 +18,7 @@
 import { mapState } from 'vuex'
 import SideBar from './SideBar'
 import Navigator from './Navigator'
-import { Editor as PostEditor, Waterfall as PostWaterfall } from './Post'
+import { Editor as PostEditor, Waterfall as PostWaterfall, Detail as PostDetail } from './Post'
 import { Editor as ReportEditor, Waterfall as ReportWaterfall } from './Report'
 import Authorize from './Authorize'
 
@@ -29,6 +30,7 @@ export default {
 		'a-sidebar': SideBar,
 		'a-navigator': Navigator,
 		'a-authorize': Authorize,
+		'a-post-detail': PostDetail,
 		'a-post-editor': PostEditor,
 		'a-post-waterfall': PostWaterfall,
 		'a-report-editor': ReportEditor,

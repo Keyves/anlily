@@ -5,7 +5,7 @@
 			<div class="editor-bg" @click="cancelPostFetch"></div>
 			<div class="editor-main">
 				<div class="header">
-					<span class="username">{{logined ? userinfo.username : '佚名'}}</span>
+					<span class="username">{{logined ? user.username : '佚名'}}</span>
 					<span class="category secondary">{{category}}</span>
 				</div>
 				<textarea class="section" type="text" :value="post.text" @input="changePostText($event.target.value)" placeholder="输入内容限100字"></textarea>
@@ -26,7 +26,7 @@ import { mapActions, mapState } from 'vuex'
 export default {
 	name: 'a-editor',
 	computed: {
-		...mapState(['post', 'userinfo']),
+		...mapState(['post', 'user']),
 		...mapState({
 			postEditorVisible: state => state.status.postEditorVisible,
 			category: state => state.status.category,

@@ -47,6 +47,7 @@ export default {
 
 .c-icon {
 	font-size: initial;
+	vertical-align: middle;
 
 	&-default {
 		color: inherit;

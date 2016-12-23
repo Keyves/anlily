@@ -28,24 +28,24 @@ const userDriver = {
 	 * 注册
 	 * @param  {Object} user 用户信息
 	 */
-	async register(userinfo) {
+	async register(user) {
 		try {
-			if (userinfo) {
-				const { email, password } = userinfo
+			if (user) {
+				const { email, password } = user
 
 				const _user = await UserModel.findOne({email})
 
 				if (_user) {
 					throw new AuthorizeError('用户已存在')
 				} else {
-					userinfo.password = await getBcryptPassword(password)
+					user.password = await getBcryptPassword(password)
 				}
 			} else {
-				userinfo = {}
+				user = {}
 			}
-			userinfo.username = await getUniqueUsername()
+			user.username = await getUniqueUsername()
 
-			return new UserModel(userinfo).save()
+			return new UserModel(user).save()
 		} catch(e) {
 			e.message = `register failed - ${e.message}`
 			throw e
@@ -56,9 +56,9 @@ const userDriver = {
 	 * 登录
 	 * @param  {Object} user 用户信息
 	 */
-	async login(userinfo) {
+	async login(user) {
 		try {
-			const { email, password } = userinfo
+			const { email, password } = user
 			const _user = await UserModel.findOne({email})
 
 			if (_user) {

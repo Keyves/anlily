@@ -1,6 +1,7 @@
 import './common.scss'
 import Button from './Button'
 import Icon from './Icon'
+import Popover from './Popover'
 import Notification from './Notification'
 import Menu from './Menu'
 import At from './At'
@@ -11,6 +12,7 @@ const Caret = At.Caret
 export {
 	Button,
 	Icon,
+	Popover,
 	Menu,
 	MenuItem,
 	Notification,
@@ -29,5 +31,6 @@ export default {
 		Vue.component(Notice.name, Notice)
 		Vue.component(At.name, At)
 		Vue.component(Caret.name, Caret)
+		Vue.component(Popover.name, Popover)
     }
 }

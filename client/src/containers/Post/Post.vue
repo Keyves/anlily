@@ -1,5 +1,5 @@
 <template>
-	<div class="article">
+	<div class="a-post">
 		<div class="header" @click="changeExpandStatus">
 			<span class="id secondary">{{'#' + id}}</span>
 			<span class="username">{{username}}</span>
@@ -18,7 +18,7 @@
 			<div class="right">
 				<c-button icon-color="error" icon="delete" v-if="admin" @click="onRemove"></c-button>
 				<c-button icon="message" @click="toggleInputboxVisible"></c-button>
-				<c-button icon="details"></c-button>
+				<c-button icon="details" @click="onDetail"></c-button>
 			</div>
 		</div>
 		<div class="footer" :class="expandStatus ? 'expand' : ''">
@@ -45,8 +45,6 @@ import Token from './Token.js'
 import $ from 'jquery'
 import parseText from './parseText'
 
-var data = ["smile", "iphone", "girl", "smiley", "heart", "kiss", "copyright", "coffee"]
-
 export default {
 	name: 'a-post',
 	props: {
@@ -64,15 +62,19 @@ export default {
 	},
 	data() {
 		return {
-			tokens: parseText(this.text),
 			editorValue: '',
-			expandStatus: this.expand,
 			inputboxVisible: false
 		}
 	},
 	computed: {
 		distanceNow() {
 			return DateLib.getDistanceNow(new Date(this.createdTime))
+		},
+		tokens() {
+			return parseText(this.text)
+		},
+		expandStatus() {
+			return this.expand
 		}
 	},
 	methods: {
@@ -85,7 +87,6 @@ export default {
 			this.expandStatus = !this.expandStatus
 		},
 		onReview(e) {
-			console.log(e.target.value)
 			this.$emit('review', e)
 		},
 		onSend(e) {
@@ -97,6 +98,9 @@ export default {
 		},
 		onReport(e) {
 			this.$emit('report', e)
+		},
+		onDetail(e) {
+			this.$emit('detail', e)
 		}
 	},
 	mounted() {
@@ -129,10 +133,11 @@ export default {
 <style lang="scss">
 @import "~src/variables";
 
-.article {
+.a-post {
 	background-color: #fff;
 	margin: $spacing $spacing / 2;
 	box-shadow: 0 0 5px $shadow-color;
+	cursor: pointer;
 
 	& > .header {
 		display: flex;

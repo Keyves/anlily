@@ -3,7 +3,7 @@
 		<div class="col" v-for="posts in cols">
 			<a-post
 				class="post"
-				v-for="post in items"
+				v-for="post in posts"
 				:admin="admin"
 				:id="post._id"
 				:username="post.username"
@@ -11,10 +11,11 @@
 				:created-time="post.createdTime"
 				:text="post.text"
 				:comments="post.comments"
-				@report="readyReport({userid: comment.userid, postid: post._id, text: post.text})"
+				@report="readyReport({userid: post.userid, postid: post._id, text: post.text})"
 				@review="changeCommentText($event.target.value)"
 				@send="enterCommentFetch({postid: post._id, comment})"
 				@remove="deletePostFetch(post._id)"
+				@detail="changePostDetail(post)"
 				>
 				<a-post-comment
 					v-for="comment in getTopTwoComments(post.comments)"
@@ -24,6 +25,7 @@
 					:agent="comment.agent"
 					:created-time="comment.createdTime"
 					:text="comment.text"
+					:comments="post.comments"
 					@report="readyReport({suspectid: comment.userid, postid: post._id, commentid: comment._id, text: post.text})"
 					@remove="deleteCommentFetch({postid: post._id, commentid: comment._id})"
 					>
@@ -45,6 +47,7 @@
 						:agent="comment.agent"
 						:created-time="comment.createdTime"
 						:text="comment.text"
+						:comments="post.comments"
 						@report="readyReport({suspectid: comment.userid, postid: post._id, commentid: comment._id, text: post.text})"
 						@remove="deleteCommentFetch({postid: post._id, commentid: comment._id})"
 						>
@@ -58,6 +61,7 @@
 					:agent="comment.agent"
 					:created-time="comment.createdTime"
 					:text="comment.text"
+					:comments="post.comments"
 					@report="readyReport({suspectid: comment.userid, postid: post._id, commentid: comment._id, text: post.text})"
 					@remove="deleteCommentFetch({postid: post._id, commentid: comment._id})"
 					>
@@ -80,7 +84,7 @@ export default {
 	computed: {
 		...mapState(['comment', 'posts']),
 		...mapState({
-			role: state => state.userinfo.role,
+			role: state => state.user.role,
 		}),
 		admin() {
 			return this.role === 1123
@@ -91,7 +95,15 @@ export default {
 	},
 	mixins: [Waterfall],
 	methods: {
-		...mapActions(['enterCommentFetch', 'changeCommentText', 'getPostsFetch', 'deletePostFetch', 'deleteCommentFetch', 'readyReport']),
+		...mapActions([
+			'enterCommentFetch',
+			'changeCommentText',
+			'getPostsFetch',
+			'deletePostFetch',
+			'deleteCommentFetch',
+			'readyReport',
+			'changePostDetail'
+		]),
 		getTopTwoComments(arr) {
 			return arr.slice(0, 2)
 		},

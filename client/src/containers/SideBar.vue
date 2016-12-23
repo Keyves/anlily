@@ -26,10 +26,9 @@ export default {
 				const forums = state.forums
 				const currentCategory = state.status.category
 
-				let i, len, categorys
+				let i, len
 				for (i = 0, len = forums.length; i < len; i++) {
-					categorys = forums[i].categorys
-					if (categorys.indexOf(currentCategory) > -1) {
+					if (forums[i].categorys.indexOf(currentCategory) > -1) {
 						forums[i].expand = true
 					}
 				}

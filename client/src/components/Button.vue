@@ -1,7 +1,7 @@
 <template>
-	<button class="c-button" :class="oClass" :type="type" :style="oStyle" @click="handleClick">
+	<button class="c-button" :class="oClass" :type="type" :style="oStyle" @click="onClick">
 		<c-icon :icon="icon" :color="iconColor" v-if="icon"></c-icon>
-		<slot></slot>
+		<span v-if="$slots.default"><slot></slot></span>
 	</button>
 </template>
 
@@ -28,7 +28,7 @@ export default {
 		}
 	},
 	methods: {
-		handleClick(e) {
+		onClick(e) {
 			this.$emit('click', e)
 		}
 	},
@@ -68,6 +68,10 @@ export default {
     color: #666;
     touch-action: manipulation;
 	cursor: pointer;
+
+	& > span {
+		vertical-align: middle;
+	}
 
 	&[disabled] {
 		border: 1px solid gray;

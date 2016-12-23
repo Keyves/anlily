@@ -3,41 +3,41 @@ const userDriver = require('../drivers/user')
 const refine = require('../utils/refine')
 const validateUser = require('../validators/user')
 
-const returnKeys = ['username', 'comments', 'createdTime', 'email', 'role']
+const returnKeys = ['username', 'comments', 'createdTime', 'email', 'role', 'messages']
 
 router
 .post('/anonymous', async (ctx) => {
-	const user = await userDriver.register()
-	ctx.session.user = user
+	const _user = await userDriver.register()
+	ctx.session.user = _user
 	ctx.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 90
-	ctx.body = refine(user, returnKeys)
+	ctx.body = refine(_user, returnKeys)
 })
 .post('/register', async (ctx) => {
-	const userinfo = refine(ctx.request.body, ['email', 'password'])
+	const user = refine(ctx.request.body, ['email', 'password'])
 
-	validateUser(userinfo)
-	userinfo.role = 1
+	validateUser(user)
+	user.role = 1
 
-	const user = await userDriver.register(userinfo)
-	ctx.session.user = user
-	ctx.body = refine(user, returnKeys)
+	const _user = await userDriver.register(user)
+	ctx.session.user = _user
+	ctx.body = refine(_user, returnKeys)
 })
 // 登录
 .post('/login', async (ctx) => {
-	const userinfo = ctx.request.body
+	const user = ctx.request.body
 
-	validateUser(userinfo)
+	validateUser(user)
 
-	const user = await userDriver.login(userinfo)
-	ctx.session.user = user
-	ctx.body = refine(user, returnKeys)
+	const _user = await userDriver.login(user)
+	ctx.session.user = _user
+	ctx.body = refine(_user, returnKeys)
 })
 // 判断是否登录
 .get('/login', async (ctx) => {
-	const user = ctx.session.user
+	const _user = ctx.session.user
 
-	if (user) {
-		ctx.body = refine(user, returnKeys)
+	if (_user) {
+		ctx.body = refine(_user, returnKeys)
 	} else {
 		ctx.status = 404
 	}

@@ -1,5 +1,6 @@
-const RE = /(@|img|emo)\[((?:.|\s)+?)\]/g
+const RE = /(@|#|img|emo)\[((?:.|\s)+?)\]/g
 const atRE = /^((?:.|\s)+):(\d*)$/
+const anchorRE = /^(\d+):(\d*)$/
 const imgRE = /https?[^\?]+\.(?:gif|png|jpe?g|bpm|tif|webp)$/
 const emoLinkMap = {
 	weixiao: 'http://emotion.jpg'
@@ -33,6 +34,14 @@ export default function parseText(string) {
 					userid: value[2]
 				} : str
 				break
+			case '#':
+				value = content.match(anchorRE)
+				type = value ? 'anchor' : 'text'
+				value = value ? {
+					commentid: value[1],
+					userid: value[2]
+				} : str
+				break
 			case 'img':
 				value = imgRE.test(content) && content
 				type =  value ? 'image' : 'text'
@@ -58,5 +67,6 @@ export default function parseText(string) {
 
 	// 补充末尾
 	tearString(start, string.length)
+
 	return tokens
 }

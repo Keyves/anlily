@@ -11,6 +11,5 @@ Notification.notice = function(messageOrOpts) {
 
 	queue.push(opts)
 }
-window.notice = Notification.notice
 
 export default Notification

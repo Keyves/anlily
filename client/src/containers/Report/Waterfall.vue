@@ -33,7 +33,7 @@ export default {
 	computed: {
 		...mapState(['reports']),
 		...mapState({
-			role: state => state.userinfo.role
+			role: state => state.user.role
 		}),
 		admin() {
 			return this.role === roles.SUPER_ADMIN

@@ -8,18 +8,21 @@
 			<c-button class="btn delete" icon-color="error" icon="delete" @click="onRemove"></c-button>
 		</div>
 		<div class="section">
-			<div class="text">{{text}}</div>
+			<a-token v-for="token in tokens" :type="token.type" :value="token.value" :comments="comments"></a-token>
 		</div>
 	</div>
 </template>
 
 <script>
 import DateLib from 'src/lib/DateLib'
+import Token from './Token.js'
+import parseText from './parseText'
 
 export default {
 	name: 'a-post-comment',
 	props: {
 		id: Number,
+		comments: Array,
 		username: String,
 		createdTime: String,
 		text: String
@@ -27,6 +30,9 @@ export default {
 	computed: {
 		distanceNow() {
 			return DateLib.getDistanceNow(new Date(this.createdTime))
+		},
+		tokens() {
+			return parseText(this.text)
 		}
 	},
 	methods: {
@@ -36,6 +42,9 @@ export default {
 		onReport(e) {
 			this.$emit('report', e)
 		}
+	},
+	components: {
+		'a-token': Token
 	}
 }
 </script>

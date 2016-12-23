@@ -5,14 +5,23 @@ import { clone } from 'src/utils'
 
 const initialPost = {
 	text: '',
-	images: [],
-	tags: [],
 	comments: []
 }
 
+const initialPostDetail = {
+	_id: 0,
+	category: '',
+	comments: [],
+	createdTime: new Date().toString(),
+	ip: '',
+	text: 'v',
+	tokens: [],
+	userid: 0,
+	username: '',
+}
+
 const initialComment = {
-	text: '',
-	images: []
+	text: ''
 }
 
 const initialUser = {
@@ -32,18 +41,20 @@ const initialReport = {
 }
 
 const initialState = {
-	userinfo: clone(initialUser),
+	user: clone(initialUser),
 	status: {
 		anonymousName: '佚名',
 		authorizeVisible: true,
-		postEditorVisible: false,
 		reportEditorVisible: false,
+		postEditorVisible: false,
+		postDetailVisible: false,
 		category: '综合版1',
 		logined: false
 	},
 	posts: [],
 	reports: [],
 	post: clone(initialPost),
+	postDetail: clone(initialPostDetail),
 	comment: clone(initialComment),
 	report: clone(initialReport),
 	forums,
@@ -52,24 +63,24 @@ const initialState = {
 
 const userMutations = {
 	[types.CHANGE_USERNAME_TEXT] (state, username) {
-		state.userinfo.username = username
+		state.user.username = username
 	},
 	[types.CHANGE_PASSWORD_TEXT] (state, password) {
-		state.userinfo.password = password
+		state.user.password = password
 	},
 	[types.CHANGE_EMAIL_TEXT] (state, email) {
-		state.userinfo.email = email
+		state.user.email = email
 	},
 }
 
 const statusMutations = {
 	[types.LOGIN_SUCCESS] (state, user) {
 		state.status.logined = true
-		state.userinfo = clone(state.userinfo, user)
+		state.user = clone(state.user, user)
 	},
 	[types.LOGOUT_SUCCESS] (state) {
 		state.status.logined = false
-		state.userinfo = clone(initialUser)
+		state.user = clone(initialUser)
 	},
 	[types.CHANGE_CATEGORY] (state, category) {
 		state.status.category = category
@@ -79,6 +90,9 @@ const statusMutations = {
 	},
 	[types.TOGGLE_POST_EDITOR_VISIBLE] (state) {
 		state.status.postEditorVisible = !state.status.postEditorVisible
+	},
+	[types.TOGGLE_POST_DETAIL_VISIBLE] (state) {
+		state.status.postDetailVisible = !state.status.postDetailVisible
 	},
 	[types.TOGGLE_REPORT_EDITOR_VISIBLE] (state) {
 		state.status.reportEditorVisible = !state.status.reportEditorVisible
@@ -90,7 +104,6 @@ const postMutations = {
 		state.post = clone(initialPost)
 	},
 	[types.GET_POSTS_FETCH_SUCCESS] (state, posts) {
-		console.debug(posts)
 		state.posts = posts
 	},
 	[types.CHANGE_POST_CONTENT] (state, value) {
@@ -102,6 +115,9 @@ const postMutations = {
 	},
 	[types.DELETE_POST_FETCH_SUCCESS] (state, postid) {
 		state.posts = state.posts.filter(v => v._id !== postid)
+	},
+	[types.CHANGE_POST_DETAIL] (state, post) {
+		state.postDetail = post
 	},
 	[types.CHANGE_COMMENT_TEXT] (state, value) {
 		state.comment.text = value

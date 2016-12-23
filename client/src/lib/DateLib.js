@@ -64,10 +64,10 @@ DateLib.getDistanceNow = (date) => {
 		return `${parseInt(distHours)}小时前`
 
 	const distDay = distHours / 24
-	if (distDay < 10)
+	if (distDay < 31)
 		return `${parseInt(distDay)}天前`
 
-	return date.toJSON().str(0, 10)
+	return date.toJSON().substr(0, 10)
 }
 
 module.exports = DateLib

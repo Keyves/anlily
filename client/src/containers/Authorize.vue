@@ -9,18 +9,18 @@
 				class="form-item"
 				type="text"
 				placeholder="邮箱"
-				:value="userinfo.email"
+				:value="user.email"
 				@input="changeEmailText($event.target.value)"
 			>
 			<input
 				class="form-item"
 				type="password"
 				placeholder="密码"
-				:value="userinfo.password"
+				:value="user.password"
 				@input="changePasswordText($event.target.value)"
 			>
 			<div class="login" v-show="this.mode === 'login'">
-				<c-button class="form-item btn" color="primary" @click="login(userinfo)">登录</c-button>
+				<c-button class="form-item btn" color="primary" @click="login(user)">登录</c-button>
 			</div>
 			<div class="register" v-show="this.mode === 'register'">
 				<input
@@ -29,7 +29,7 @@
 					placeholder="重复密码"
 					@input="changePasswordRepeatText($event.target.value)"
 				>
-				<c-button class="form-item btn" color="primary" :disabled="disabledRegister" @click="register(userinfo)">注册</c-button>
+				<c-button class="form-item btn" color="primary" :disabled="disabledRegister" @click="register(user)">注册</c-button>
 			</div>
 			<div class="help">
 				<c-button class="btn" color="ghost">忘记密码？</c-button>
@@ -52,7 +52,7 @@ export default {
 		}
 	},
 	computed: {
-		...mapState(['userinfo']),
+		...mapState(['user']),
 		...mapState({
 			authorizeVisible: state => state.status.authorizeVisible
 		})
@@ -69,7 +69,7 @@ export default {
 			'getLoginedUser'
 		]),
 		changePasswordRepeatText(value) {
-			this.disabledRegister = value !== this.userinfo.password
+			this.disabledRegister = value !== this.user.password
 		},
 		switchMode() {
 			this.mode = this.mode === 'login' ? 'register' : 'login'
@@ -90,6 +90,7 @@ export default {
 	left: 0;
 	width: 100%;
 	height: 100%;
+	z-index: 50;
 
 	&-bg {
 		width: 100%;

@@ -23,6 +23,10 @@ const messageSchema = new Schema({
 	commentid: {
 		type: Number,
 		ref: 'Comment'
+	},
+	read: {
+		type: Boolean,
+		default: false
 	}
 })
 

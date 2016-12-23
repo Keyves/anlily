@@ -13,6 +13,7 @@ const commentSchema = new Schema({
 		type: Number,
 		default: 1
 	},
+	ip: String,
 	username: String,
 	text: String,
 	tokens: [Mixed],
