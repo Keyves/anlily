@@ -1,3 +1,2 @@
 #!/usr/bin/env node
 require('runkoa')(process.cwd() + '/server/bin/www')
-console.log(process.cwd() + '/bin/www')

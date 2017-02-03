@@ -3,6 +3,8 @@ node_modules
 coverage
 design
 .db
+.temp
+emotion
 
 # file
 *.DS_Store
