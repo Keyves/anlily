@@ -5,9 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const autoprefixer = require('autoprefixer')
 
 const SRC_PATH = path.resolve(__dirname, 'src')
+const ASSETS_PATH = path.resolve(__dirname, 'assets')
 const DIST_PATH = path.resolve(__dirname, 'dist')
-
-const APP_PATH = path.resolve(SRC_PATH, 'app')
 
 const config = {
 	debug: true,
@@ -18,18 +17,7 @@ const config = {
 		publicPath: '/dist' //模板、样式、脚本、图片等资源对应server上的路径
 	},
 	entry: {
-		lib: [
-			'es6-shim',
-			'immutable',
-			'isomorphic-fetch',
-			'react',
-			'react-dom',
-			'react-immutable-render-mixin',
-			'react-redux',
-			'redux',
-			'redux-thunk'
-		],
-		index: [path.resolve(APP_PATH, 'index')]
+		index: [path.resolve(SRC_PATH, 'index')]
 	},
 	output: {
 		path: DIST_PATH, //输出目录的配置，模板、样式、脚本、图片等资源的路径配置都相对于它
@@ -39,36 +27,46 @@ const config = {
 	},
 	resolve: {
 		alias: {
-			app: APP_PATH,
-			css: path.resolve(SRC_PATH, 'css'),
-			assets: path.resolve(SRC_PATH, 'css'),
-			data: path.resolve(SRC_PATH, 'data')
+			src: SRC_PATH,
+			assets: ASSETS_PATH,
+			vue: 'vue/dist/vue.js'
 		},
-		extensions: ['', '.js', '.jsx']
+		extensions: ['', '.js', '.vue']
+	},
+	vue : {
+		loaders: {
+			scss: ExtractTextPlugin.extract('vue-style-loader', 'css!sass')//'vue-style-loader!css!sass'
+		}
 	},
 	module: {
 		loaders: [{
-			test: /\.jsx?$/,
-			include: APP_PATH,
-			loader: 'babel' // 'babel' is also a legal name to reference
+			test: /\.js$/,
+			exclude: /node_modules/,
+			loader: 'babel'
+		}, {
+			test: /\.vue$/,
+			loader: 'vue'
 		}, {
 			test: /\.s?css$/,
-			include: SRC_PATH,
-			loader: ExtractTextPlugin.extract('style', 'css!postcss!sass')
+			loader: ExtractTextPlugin.extract('vue-style-loader', 'css!sass')//'vue-style-loader!css!sass'
+		}, {
+			test: /\.json$/,
+			loader: 'json'
 		}, {
 			test: /\.(jpg|png)$/,
-			exclude: /node_modules/,
 			loader: 'url?name=images/[name].[ext]&limit=51200'
 		}, {
-			test: /\.(eot|svg|ttf|woff)$/,
-			exclude: /node_modules/,
-			loader: 'url?name=font/[name].[ext]&limit=1000'
+			test: /\.(eot|svg|ttf|woff(2)?)(\?[a-z0-9=\.]+)?$/,
+			loader: 'url?name=fonts/[name].[ext]&limit=1000'
 		}]
 	},
 	postcss: [autoprefixer({ browsers: ['> 1%', 'last 2 versions'] })],
+	externals: {
+		jquery: 'window.$'
+	},
 	plugins: [
 		new webpack.optimize.CommonsChunkPlugin('lib', 'js/lib.js'),
-		new ExtractTextPlugin('css/[name].css', {
+		new ExtractTextPlugin('[name].css', {
 			allChunks: false
 		})
 	]
@@ -102,16 +100,16 @@ if (process.env.NODE_ENV === 'development') {
 		}
 	}
 	config.plugins.unshift(new webpack.DefinePlugin({
-		'process.env.NODE_ENV': JSON.stringify("development")
+		'process.env.NODE_ENV': JSON.stringify('development')
 	}))
 	config.plugins.unshift(new webpack.HotModuleReplacementPlugin())
-	config.devtool = 'inline-source-map'
+	config.devtool = 'source-map'
 }
 
 
 if (process.env.NODE_ENV === 'production') {
 	config.plugins.unshift(new webpack.DefinePlugin({
-		'process.env.NODE_ENV': JSON.stringify("production")
+		'process.env.NODE_ENV': JSON.stringify('production')
 	}))
 	config.plugins.push(new webpack.optimize.OccurrenceOrderPlugin())
 	config.plugins.push(new webpack.optimize.UglifyJsPlugin({

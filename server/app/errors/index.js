@@ -1,1 +1,0 @@
-exports.AuthorizeError = require('./AuthorizeError')
